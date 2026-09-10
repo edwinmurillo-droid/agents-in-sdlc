@@ -134,6 +134,25 @@ Copilot will launch a browser through the Playwright MCP server, walk through ea
 > The app needs to be running at `http://localhost:4321` for this test. If you stopped the dev server, start it again before sending the prompt. The first time Copilot uses the Playwright MCP server it may need to download a browser — if it reports a missing browser, have it run `npx playwright install chromium` and try again.
 
 [playwright-mcp-server]: https://github.com/microsoft/playwright-mcp
+
+## MCP works the same way in other agents
+
+MCP isn't specific to Copilot CLI — it's an open standard, so the servers you register work the same way with any MCP-compatible agent. For example, **[Claude Code][claude-code-mcp]** manages servers with a `claude mcp add` command instead of `/mcp add`, but the concepts are identical.
+
+Adding a local (stdio) server, like Playwright, looks like this:
+
+```bash
+claude mcp add playwright -- npx @playwright/mcp@latest --headless
+```
+
+Adding a remote (HTTP) server, like the GitHub MCP server, just adds a `--transport` flag:
+
+```bash
+claude mcp add github --transport http https://api.githubcopilot.com/mcp/
+```
+
+See [Connecting Claude Code to tools with MCP][claude-code-mcp] for the full walkthrough, including authentication for remote servers.
+
 ## Summary and next steps
 
 Congratulations, you used the Playwright MCP server to manually test your feature with Copilot CLI! To recap, you:
@@ -150,9 +169,11 @@ Now that you've confirmed the feature works, you can continue to the next exerci
 - [Microsoft Playwright MCP Server][playwright-mcp-server]
 - [Adding MCP servers for Copilot CLI][cli-add-mcp]
 - [GitHub MCP Server][github-mcp-server]
+- [Connecting Claude Code to tools with MCP][claude-code-mcp]
 
 [previous-lesson]: ../3-generating-code/
 [next-lesson]: ../5-agent-skills/
 [mcp-blog-post]: https://github.blog/ai-and-ml/llms/what-the-heck-is-mcp-and-why-is-everyone-talking-about-it/
 [github-mcp-server]: https://github.com/github/github-mcp-server
 [cli-add-mcp]: https://docs.github.com/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers
+[claude-code-mcp]: https://claude.ai/help-center/sharing/integrations/mcp#claude-code
