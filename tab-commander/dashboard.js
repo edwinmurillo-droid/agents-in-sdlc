@@ -7,6 +7,7 @@ const state = {
   selected: new Set(),
   query: "",
   ownTabId: null,
+  currentWindowId: null,
 };
 
 const el = {
@@ -27,10 +28,26 @@ const el = {
   confirmText: document.getElementById("confirmText"),
   confirmYes: document.getElementById("confirmYes"),
   confirmNo: document.getElementById("confirmNo"),
+  toast: document.getElementById("toast"),
 };
 
 const DEFAULT_FAVICON =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%233a3f4d'/%3E%3C/svg%3E";
+
+// ---------- toast feedback ----------
+
+let toastTimer = null;
+
+function showToast(message, kind = "error") {
+  if (!el.toast) return;
+  el.toast.textContent = message;
+  el.toast.className = `toast toast-${kind}`;
+  el.toast.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.toast.hidden = true;
+  }, 4000);
+}
 
 // ---------- data loading & live updates ----------
 
@@ -63,7 +80,19 @@ chrome.runtime.onMessage.addListener((message) => {
 
 if (chrome.tabs?.getCurrent) {
   chrome.tabs.getCurrent((tab) => {
-    if (tab) state.ownTabId = tab.id;
+    if (tab) {
+      state.ownTabId = tab.id;
+      render();
+    }
+  });
+}
+
+if (chrome.windows?.getCurrent) {
+  chrome.windows.getCurrent((win) => {
+    if (win) {
+      state.currentWindowId = win.id;
+      render();
+    }
   });
 }
 
@@ -77,8 +106,14 @@ function matchesQuery(tab, query) {
   );
 }
 
+// The dashboard's own tab is never a meaningful "open tab" to manage —
+// keep it out of counts, lists, and selection entirely.
+function getVisibleTabs() {
+  return state.tabs.filter((t) => t.id !== state.ownTabId);
+}
+
 function getFilteredTabs() {
-  return state.tabs.filter((t) => matchesQuery(t, state.query));
+  return getVisibleTabs().filter((t) => matchesQuery(t, state.query));
 }
 
 // ---------- rendering ----------
@@ -175,9 +210,8 @@ function render() {
     byWindow.get(tab.windowId).push(tab);
   }
 
-  for (const [windowId, tabs] of [...byWindow.entries()].sort(
-    (a, b) => a[0] - b[0]
-  )) {
+  const sortedWindows = [...byWindow.entries()].sort((a, b) => a[0] - b[0]);
+  sortedWindows.forEach(([windowId, tabs], index) => {
     const group = document.createElement("section");
     group.className = "window-group";
 
@@ -194,19 +228,44 @@ function render() {
       }
       render();
     });
+
+    const isCurrent = windowId === state.currentWindowId;
     const label = document.createElement("span");
-    label.innerHTML = `Window <strong>${windowId}</strong> &middot; ${tabs.length} tab${
-      tabs.length === 1 ? "" : "s"
-    }`;
+    label.className = "window-label";
+    const name = document.createElement("strong");
+    name.textContent = isCurrent ? "Current window" : `Window ${index + 1}`;
+    const count = document.createElement("span");
+    count.className = "window-count";
+    count.textContent = ` · ${tabs.length} tab${tabs.length === 1 ? "" : "s"}`;
+    label.append(name, count);
+
+    const first = tabs[0];
+    if (first) {
+      const preview = document.createElement("span");
+      preview.className = "window-preview";
+      const favicon = document.createElement("img");
+      favicon.className = "favicon";
+      favicon.src = first.favIconUrl || DEFAULT_FAVICON;
+      favicon.addEventListener("error", () => {
+        favicon.src = DEFAULT_FAVICON;
+      });
+      const previewText = document.createElement("span");
+      previewText.textContent =
+        tabs.length > 1 ? `${first.title} +${tabs.length - 1} more` : first.title;
+      preview.append(favicon, previewText);
+      label.appendChild(preview);
+    }
+
     header.append(selectAll, label);
     group.appendChild(header);
 
     for (const tab of tabs) group.appendChild(buildTabRow(tab));
     el.windows.appendChild(group);
-  }
+  });
 
-  el.tabCount.textContent = `${state.tabs.length} tab${
-    state.tabs.length === 1 ? "" : "s"
+  const visibleCount = getVisibleTabs().length;
+  el.tabCount.textContent = `${visibleCount} tab${
+    visibleCount === 1 ? "" : "s"
   } open`;
   updateActionBar();
 }
@@ -225,15 +284,29 @@ function updateActionBar() {
 
 function closeTabs(tabIds) {
   const ids = tabIds.filter((id) => id !== state.ownTabId);
-  if (ids.length === 0) return;
-  chrome.runtime.sendMessage({ type: "CLOSE_TABS", tabIds: ids }, () => {
+  if (ids.length === 0) {
+    showToast("Nothing to close — the dashboard tab can't close itself.");
+    return;
+  }
+  chrome.runtime.sendMessage({ type: "CLOSE_TABS", tabIds: ids }, (response) => {
+    if (chrome.runtime.lastError) {
+      showToast(`Couldn't close tabs: ${chrome.runtime.lastError.message}`);
+      return;
+    }
+    if (!response?.ok) {
+      showToast(`Couldn't close tabs: ${response?.error || "unknown error"}`);
+      return;
+    }
     for (const id of ids) state.selected.delete(id);
   });
 }
 
 function confirmAndClose(tabIds, description) {
   const ids = tabIds.filter((id) => id !== state.ownTabId);
-  if (ids.length === 0) return;
+  if (ids.length === 0) {
+    showToast("Nothing to close — the dashboard tab can't close itself.");
+    return;
+  }
   if (ids.length > 3) {
     showConfirm(
       `Close ${ids.length} tabs (${description})?`,
