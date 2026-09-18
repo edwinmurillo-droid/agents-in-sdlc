@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tab Commander</title>
+<link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+<header class="toolbar">
+  <div class="title">
+    <span class="logo">🗂️</span>
+    <h1>Tab Commander</h1>
+    <span id="tabCount" class="tab-count"></span>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="Filter by title or URL (e.g. suno)" autocomplete="off" />
+      <button id="clearSearch" class="ghost" title="Clear filter" hidden>&times;</button>
+    </div>
+    <button id="mic" class="icon-btn" title="Voice command">🎤</button>
+    <button id="closeSelected" class="danger" disabled>Close selected (<span id="selectedCount">0</span>)</button>
+    <button id="closeMatching" class="danger" disabled>Close all matching</button>
+  </div>
+</header>
+
+<div id="voicePanel" class="panel voice-panel" hidden>
+  <div class="panel-row">
+    <span id="voiceStatus" class="voice-status">Listening…</span>
+    <button id="voiceStop" class="ghost">Stop</button>
+  </div>
+  <p id="voiceTranscript" class="voice-transcript"></p>
+  <p id="voiceHint" class="voice-hint">
+    Try: "close all suno tabs" · "close tabs matching netflix" · "close this window's tabs"
+  </p>
+</div>
+
+<div id="confirmPanel" class="panel confirm-panel" hidden>
+  <p id="confirmText"></p>
+  <div class="panel-row">
+    <button id="confirmYes" class="danger">Close them</button>
+    <button id="confirmNo" class="ghost">Cancel</button>
+  </div>
+</div>
+
+<main id="windows"></main>
+<p id="emptyState" class="empty-state" hidden>No tabs match your filter.</p>
+
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
