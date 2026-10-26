@@ -35,3 +35,6 @@ venv/
 # Lychee / local-only artifacts
 .playwright-mcp/
 sidebar-vscode.png
+
+# Generated workbook output
+workbook/dist/

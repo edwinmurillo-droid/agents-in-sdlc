@@ -1,0 +1,510 @@
+<title>Copilot Workshops Workbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: sticky toolbar, then a lesson index rail beside one content column (rail folds above content on phones).
+   Tokens follow the "Agents in SDLC" design system: dark only, platform fonts, hairline borders, no shadows. */
+:root {
+  --bg: #14161c;
+  --panel: #1c1f27;
+  --panel-header: #21242e;
+  --panel-2: #23273240;
+  --border: #2c303c;
+  --text: #e8e9ed;
+  --text-dim: #9497a3;
+  --accent: #5b8cff;
+  --row-selected: #5b8cff1a;
+  --row-hover: #ffffff08;
+  --hover-wash: #ffffff10;
+  --danger: #e5566a;
+  --highlight: #ffd76633;
+  --workshop-blue: #2563eb;
+  --on-workshop-blue: #ffffff;
+  --ok: #3fb67a;            /* added: correct answers and finished lessons (6.3:1 on panel) */
+  --ok-wash: #3fb67a1f;
+  --danger-wash: #e5566a1f;
+  --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --radius-xs: 2px; --radius-md: 4px; --radius-control: 6px; --radius-panel: 8px; --radius-group: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font: 14px/1.55 var(--font-sans); margin: 0; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+code, pre { font-family: var(--font-mono); }
+.dim { color: var(--text-dim); }
+
+/* Toolbar */
+.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); border-bottom: 1px solid var(--border);
+  padding-block: 12px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); margin-right: auto; min-width: 0; }
+.mark { width: 26px; height: 26px; border-radius: 50%; background: var(--workshop-blue); color: var(--on-workshop-blue); display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+.brand h1 { font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.nav a { color: var(--text-dim); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: var(--radius-control); border: 1px solid transparent; }
+.nav a:hover { background: var(--hover-wash); color: var(--text); }
+.nav a[aria-current="page"] { color: var(--text); border-color: var(--border); background: var(--bg); }
+.progress-pill { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress-pill b { color: var(--text); font-weight: 600; }
+
+/* Shell */
+.shell { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 20px; max-width: 1240px; margin: 0 auto;
+  padding-block: 20px 40px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); align-self: start; max-height: calc(100vh - 92px); overflow: auto; display: grid; gap: 12px; }
+.rail details { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-group); overflow: hidden; }
+.rail summary { list-style: none; cursor: pointer; background: var(--panel-header); padding: 8px 14px; display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; }
+.rail summary::-webkit-details-marker { display: none; }
+.rail summary .count { color: var(--text-dim); font-weight: 400; font-variant-numeric: tabular-nums; }
+.rail ol { list-style: none; margin: 0; padding: 0; }
+.rail li + li { border-top: 1px solid var(--panel-2); }
+.rail li a { display: grid; grid-template-columns: 18px 20px minmax(0, 1fr); gap: 6px; align-items: baseline; padding: 6px 14px; font-size: 13px; color: var(--text); text-decoration: none; }
+.rail li a:hover { background: var(--row-hover); }
+.rail li a[aria-current="page"] { background: var(--row-selected); }
+.rail .n { color: var(--text-dim); font-variant-numeric: tabular-nums; text-align: right; }
+.rail .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tick { color: var(--border); font-size: 12px; }
+.tick.on { color: var(--ok); }
+.rail .quiz-link { color: var(--accent); }
+main { min-width: 0; display: grid; gap: 20px; align-content: start; }
+
+/* Shared blocks */
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-panel); padding: 12px 16px; min-width: 0; }
+.group { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-group); overflow: hidden; min-width: 0; }
+.group > header { background: var(--panel-header); padding: 8px 14px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.group > header h3 { font-size: 13px; font-weight: 600; }
+.group > header .meta { margin-left: auto; font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.group .body { padding: 12px 16px; }
+.eyebrow { font-size: 12px; color: var(--text-dim); letter-spacing: 0.04em; text-transform: uppercase; }
+.lead { font-size: 15px; max-width: 68ch; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+ul.clean { margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 72ch; }
+.btn { font: inherit; font-size: 13px; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 6px 10px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--hover-wash); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #0b1020; font-weight: 600; }
+.btn.primary:hover { background: #7aa2ff; }
+.btn.done { border-color: var(--ok); color: var(--ok); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.bar { height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ok); }
+
+/* Home */
+.hero { display: grid; gap: 10px; }
+.hero h2 { font-size: 24px; font-weight: 700; }
+.how { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.how .panel b { display: block; font-size: 13px; margin-bottom: 2px; }
+.how .panel span { font-size: 13px; color: var(--text-dim); }
+.tracks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
+.lesson-row { display: grid; grid-template-columns: 18px 22px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 8px 14px; color: var(--text); text-decoration: none; }
+.lesson-row + .lesson-row { border-top: 1px solid var(--panel-2); }
+.lesson-row:hover { background: var(--row-hover); }
+.lesson-row .n { color: var(--text-dim); font-variant-numeric: tabular-nums; text-align: right; font-size: 13px; }
+.lesson-row .t { font-size: 13.5px; min-width: 0; }
+.lesson-row .m { font-size: 12px; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.group footer { border-top: 1px solid var(--border); padding: 8px 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 13px; }
+
+/* Lesson */
+.lesson-head { display: grid; gap: 8px; }
+.lesson-head h2 { font-size: 24px; font-weight: 700; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font-size: 12px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px; font-variant-numeric: tabular-nums; }
+.chip.warn { color: var(--danger); border-color: var(--danger); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.video { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.video .play { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); display: grid; place-items: center; color: var(--text-dim); flex: none; }
+.video.has .play { background: var(--accent); border-color: var(--accent); color: #0b1020; }
+.steps { counter-reset: s; list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 26px 1fr; gap: 6px; font-size: 13.5px; }
+.steps li::before { content: counter(s); color: var(--text-dim); font-variant-numeric: tabular-nums; text-align: right; }
+.snippet { border: 1px solid var(--border); border-radius: var(--radius-panel); background: var(--bg); overflow: hidden; min-width: 0; }
+.snippet header { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 12px; border-bottom: 1px solid var(--border); background: var(--panel-header); flex-wrap: wrap; }
+.snippet header .k { font-size: 12px; color: var(--text-dim); margin-right: auto; min-width: 0; }
+.snippet pre { margin: 0; padding: 10px 12px; white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.5; max-height: 320px; overflow: auto; }
+.snippets { display: grid; gap: 10px; }
+.pager { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.stale { border-color: var(--danger); }
+
+/* Questions */
+.qs { display: grid; gap: 14px; }
+.q { border: 1px solid var(--border); border-radius: var(--radius-panel); padding: 12px 14px; background: var(--bg); min-width: 0; }
+.q .from { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+.q h4 { font-size: 14px; font-weight: 600; margin: 0 0 10px; }
+.opts { display: grid; gap: 6px; }
+.opt { font: inherit; font-size: 13.5px; text-align: left; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 8px 10px; cursor: pointer; display: grid; grid-template-columns: 22px 1fr; gap: 6px; }
+.opt:hover:not([disabled]) { background: var(--panel-header); }
+.opt .l { color: var(--text-dim); font-weight: 600; }
+.opt[disabled] { cursor: default; }
+.opt.right { border-color: var(--ok); background: var(--ok-wash); }
+.opt.wrong { border-color: var(--danger); background: var(--danger-wash); }
+.why { margin-top: 10px; font-size: 13px; display: grid; gap: 6px; }
+.why .verdict { font-weight: 600; }
+.why .verdict.ok { color: var(--ok); }
+.why .verdict.no { color: var(--danger); }
+.order { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.order li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 6px; align-items: center; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 6px 6px 6px 10px; font-size: 13.5px; }
+.order li .l { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.order li.right { border-color: var(--ok); }
+.order li.wrong { border-color: var(--danger); }
+.mv { font: inherit; width: 30px; height: 28px; color: var(--text-dim); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; }
+.mv:hover:not([disabled]) { color: var(--text); background: var(--hover-wash); }
+.mv[disabled] { opacity: 0.35; cursor: default; }
+.link-btn { font: inherit; font-size: 12px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; justify-self: start; }
+
+/* Prompt library */
+.filters { display: grid; gap: 10px; }
+.search { position: relative; }
+.search input { width: 100%; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 8px 10px; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 12px; color: var(--text-dim); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.seg button[aria-pressed="true"] { color: var(--text); border-color: var(--accent); background: var(--row-selected); }
+mark { background: var(--highlight); color: inherit; border-radius: var(--radius-xs); }
+.empty { text-align: center; color: var(--text-dim); padding: 40px 0; }
+
+/* Cheat sheets */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; vertical-align: top; padding: 7px 14px; border-top: 1px solid var(--panel-2); }
+th { color: var(--text-dim); font-weight: 600; font-size: 12px; border-top: 0; background: var(--panel-header); }
+td:first-child { white-space: nowrap; }
+td code { font-size: 12.5px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0 4px; }
+
+/* Quiz */
+.score { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.score .big { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-panel); padding: 8px 16px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px #00000060; z-index: 20; }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; max-height: none; }
+  .rail details:not([open]) ol { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .opt, .btn, .nav a { transition: background-color 0.12s, border-color 0.12s; }
+}
+</style>
+
+<header class="toolbar">
+  <a class="brand" href="#home"><span class="mark" aria-hidden="true">A</span><h1>Copilot Workshops Workbook</h1></a>
+  <nav class="nav" aria-label="Workbook sections">
+    <a href="#home" data-view="home">Index</a>
+    <a href="#prompts" data-view="prompts">Prompt library</a>
+    <a href="#videos" data-view="videos">Video library</a>
+    <a href="#cheatsheets" data-view="cheatsheets">Cheat sheets</a>
+  </nav>
+  <span class="progress-pill" id="progress"></span>
+</header>
+
+<div class="shell">
+  <aside class="rail" id="rail" aria-label="Lessons"></aside>
+  <main id="view" tabindex="-1"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script type="application/json" id="workbook-data">__WORKBOOK_DATA__</script>
+<script>
+(function () {
+  const DATA = JSON.parse(document.getElementById('workbook-data').textContent);
+  const STORE_KEY = 'copilot-workbook-v1';
+  const LETTERS = 'ABCDEFGH';
+  const view = document.getElementById('view');
+  const tracksById = Object.fromEntries(DATA.tracks.map((t) => [t.id, t]));
+
+  // ---- Per-viewer progress (browser storage, optional) ----
+  let state = { done: {}, answers: {} };
+  try { state = Object.assign(state, JSON.parse(localStorage.getItem(STORE_KEY) || '{}')); } catch (e) { /* storage unavailable */ }
+  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ } }
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const tick = (on) => `<span class="tick ${on ? 'on' : ''}" aria-hidden="true">${on ? '●' : '○'}</span>`;
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toast.timer); toast.timer = setTimeout(() => { t.hidden = true; }, 1800);
+  }
+
+  async function copy(text, btn) {
+    try { await navigator.clipboard.writeText(text); toast('Copied to clipboard'); }
+    catch (e) {
+      const pre = btn.closest('.snippet').querySelector('pre');
+      const range = document.createRange(); range.selectNodeContents(pre);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      toast('Text selected. Press Ctrl+C or ⌘C to copy.');
+    }
+  }
+
+  function trackProgress(trackId) {
+    const ids = tracksById[trackId].lessons;
+    return { done: ids.filter((id) => state.done[id]).length, total: ids.length };
+  }
+
+  function renderProgress() {
+    const all = Object.keys(DATA.lessons);
+    const done = all.filter((id) => state.done[id]).length;
+    document.getElementById('progress').innerHTML = `<b>${done}</b> of ${all.length} lessons done`;
+  }
+
+  function renderRail(currentId) {
+    const current = DATA.lessons[currentId];
+    const quizTrack = location.hash.startsWith('#quiz-') ? location.hash.slice(6) : null;
+    document.getElementById('rail').innerHTML = DATA.tracks.map((t) => {
+      const p = trackProgress(t.id);
+      const open = (current && current.track === t.id) || quizTrack === t.id || (!current && !quizTrack && window.innerWidth > 860);
+      return `<details ${open ? 'open' : ''}><summary><span>${esc(t.name)}</span><span class="count">${p.done}/${p.total}</span></summary><ol>
+        ${t.lessons.map((id) => { const l = DATA.lessons[id]; return `<li><a href="#${id}" ${id === currentId ? 'aria-current="page"' : ''}>${tick(state.done[id])}<span class="n">${l.num}</span><span class="t">${esc(l.title)}</span></a></li>`; }).join('')}
+        <li><a href="#quiz-${t.id}" class="quiz-link" ${quizTrack === t.id ? 'aria-current="page"' : ''}><span></span><span class="n">✓</span><span class="t">Track quiz</span></a></li>
+      </ol></details>`;
+    }).join('');
+  }
+
+  // ---- Questions ----
+  function questionHTML(q, showFrom) {
+    const from = showFrom ? `<div class="from">${esc(tracksById[DATA.lessons[q.lesson].track].name)} · ${DATA.lessons[q.lesson].num}. ${esc(DATA.lessons[q.lesson].title)}</div>` : '';
+    return `<div class="q" data-q="${q.id}">${from}<h4>${esc(q.q)}</h4><div class="qbody"></div></div>`;
+  }
+
+  function paintQuestion(el, q) {
+    const body = el.querySelector('.qbody');
+    const saved = state.answers[q.id];
+    if (q.type === 'order') {
+      const order = saved ? saved.order : q.start.slice();
+      const checked = saved && saved.checked;
+      const correct = checked && order.every((v, i) => v === i);
+      body.innerHTML = `<ol class="order">${order.map((itemIdx, pos) => {
+        const cls = checked ? (itemIdx === pos ? 'right' : 'wrong') : '';
+        return `<li class="${cls}"><span class="l">${pos + 1}</span><span>${esc(q.items[itemIdx])}</span><span class="row">
+          <button class="mv" data-mv="-1" data-pos="${pos}" ${checked || pos === 0 ? 'disabled' : ''} aria-label="Move up">↑</button>
+          <button class="mv" data-mv="1" data-pos="${pos}" ${checked || pos === order.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button></span></li>`;
+      }).join('')}</ol>
+      ${checked ? `<div class="why"><span class="verdict ${correct ? 'ok' : 'no'}">${correct ? 'Correct order.' : 'Not quite. The correct order is:'}</span>
+        ${correct ? '' : `<ol class="clean">${q.items.map((it) => `<li>${esc(it)}</li>`).join('')}</ol>`}
+        <span>${esc(q.why)}</span><button class="link-btn" data-retry>Try again</button></div>`
+        : `<div class="row" style="margin-top:10px"><button class="btn" data-check>Check order</button></div>`}`;
+      body.querySelectorAll('.mv').forEach((b) => b.addEventListener('click', () => {
+        const pos = +b.dataset.pos, to = pos + +b.dataset.mv;
+        const next = order.slice(); [next[pos], next[to]] = [next[to], next[pos]];
+        state.answers[q.id] = { order: next, checked: false }; save(); paintQuestion(el, q);
+      }));
+      const check = body.querySelector('[data-check]');
+      if (check) check.addEventListener('click', () => { state.answers[q.id] = { order, checked: true }; save(); paintQuestion(el, q); onAnswer(); });
+    } else {
+      const answered = typeof saved === 'number';
+      body.innerHTML = `<div class="opts" role="group">${q.options.map((o, i) => {
+        let cls = '';
+        if (answered && i === q.answer) cls = 'right';
+        else if (answered && i === saved) cls = 'wrong';
+        return `<button class="opt ${cls}" data-i="${i}" ${answered ? 'disabled' : ''}><span class="l">${LETTERS[i]}</span><span>${esc(o)}</span></button>`;
+      }).join('')}</div>
+      ${answered ? `<div class="why"><span class="verdict ${saved === q.answer ? 'ok' : 'no'}">${saved === q.answer ? 'Correct.' : `Not quite. The answer is ${LETTERS[q.answer]}.`}</span><span>${esc(q.why)}</span><button class="link-btn" data-retry>Try again</button></div>` : ''}`;
+      body.querySelectorAll('.opt').forEach((b) => b.addEventListener('click', () => { state.answers[q.id] = +b.dataset.i; save(); paintQuestion(el, q); onAnswer(); }));
+    }
+    const retry = body.querySelector('[data-retry]');
+    if (retry) retry.addEventListener('click', () => { delete state.answers[q.id]; save(); paintQuestion(el, q); onAnswer(); });
+  }
+
+  function isCorrect(q) {
+    const a = state.answers[q.id];
+    if (q.type === 'order') return !!(a && a.checked && a.order.every((v, i) => v === i));
+    return a === q.answer;
+  }
+  function isAnswered(q) {
+    const a = state.answers[q.id];
+    return q.type === 'order' ? !!(a && a.checked) : typeof a === 'number';
+  }
+
+  let onAnswer = () => {};
+  function mountQuestions(container, questions) {
+    container.querySelectorAll('.q').forEach((el) => paintQuestion(el, questions.find((q) => q.id === el.dataset.q)));
+  }
+
+  // ---- Views ----
+  function home() {
+    const total = Object.values(DATA.lessons);
+    const promptCount = DATA.prompts.length;
+    const qCount = total.reduce((n, l) => n + l.questions.length, 0);
+    view.innerHTML = `
+      <section class="hero">
+        <span class="eyebrow">GitHub Copilot agents across the software development lifecycle</span>
+        <h2>Your workbook for the Copilot Workshops</h2>
+        <p class="lead dim">Every lesson from the four workshop tracks, condensed: what you'll do, the ideas to remember, the exact prompts to paste, and a knowledge check. Your progress stays in this browser.</p>
+        <div class="chips"><span class="chip">${total.length} lessons</span><span class="chip">${promptCount} prompts</span><span class="chip">${qCount} questions</span><span class="chip">Updated ${esc(DATA.generated)}</span></div>
+      </section>
+      <section class="how" aria-label="How to use this workbook">
+        <div class="panel"><b>1 · Pick a track</b><span>Each track uses a different Copilot surface. Start with the one your team uses.</span></div>
+        <div class="panel"><b>2 · Work a lesson</b><span>Read the summary, follow the full lesson, and copy prompts from here.</span></div>
+        <div class="panel"><b>3 · Check yourself</b><span>Answer the questions, then mark the lesson done.</span></div>
+        <div class="panel"><b>4 · Take the track quiz</b><span>All of a track's questions in one place, with a score.</span></div>
+      </section>
+      <section class="tracks">${DATA.tracks.map((t) => {
+        const p = trackProgress(t.id);
+        return `<div class="group"><header><h3>${esc(t.name)}</h3><span class="dim" style="font-size:12px">${esc(t.blurb)}</span><span class="meta">${p.done}/${p.total} done</span></header>
+          <div class="bar" aria-hidden="true"><i style="width:${(100 * p.done / p.total).toFixed(1)}%"></i></div>
+          ${t.lessons.map((id) => { const l = DATA.lessons[id]; return `<a class="lesson-row" href="#${id}">${tick(state.done[id])}<span class="n">${l.num}</span><span class="t">${esc(l.title)}</span><span class="m">${plural(l.prompts.length, 'prompt')} · ${l.questions.length} Q</span></a>`; }).join('')}
+          <footer><span class="dim">${plural(t.lessons.reduce((n, id) => n + DATA.lessons[id].questions.length, 0), 'question')} in the track quiz</span><a class="btn" href="#quiz-${t.id}">Take the track quiz</a></footer></div>`;
+      }).join('')}</section>`;
+  }
+
+  function snippetHTML(p, i, label) {
+    return `<div class="snippet"><header><span class="k">${label}</span><button class="btn" data-copy="${i}">Copy</button></header><pre>${p.html || esc(p.text)}</pre></div>`;
+  }
+  const KIND_LABEL = { prompt: 'Prompt', issue: 'Issue text', instructions: 'Instructions snippet', slash: 'Slash command', command: 'Terminal' };
+
+  function lesson(id) {
+    const l = DATA.lessons[id];
+    const t = tracksById[l.track];
+    const idx = t.lessons.indexOf(id);
+    const prev = t.lessons[idx - 1], next = t.lessons[idx + 1];
+    const snippets = l.prompts.concat(l.commands.map((text) => ({ kind: 'command', text })));
+    const done = !!state.done[id];
+    view.innerHTML = `
+      <section class="lesson-head">
+        <span class="eyebrow">${esc(t.name)} · Lesson ${l.num} of ${t.lessons.length - 1}</span>
+        <h2>${esc(l.title)}</h2>
+        <div class="chips"><span class="chip">${plural(l.steps, 'step')}</span><span class="chip">~${l.minutes} min read</span><span class="chip">${plural(l.prompts.length, 'prompt')}</span><span class="chip">${plural(l.questions.length, 'question')}</span>${l.stale ? '<span class="chip warn">Lesson changed since these questions were written</span>' : ''}</div>
+        <p class="lead">${esc(l.summary)}</p>
+        <div class="row"><a class="btn primary" href="${esc(l.url)}" target="_blank" rel="noopener">Open the full lesson ↗</a><button class="btn ${done ? 'done' : ''}" data-done>${done ? '● Done' : 'Mark as done'}</button></div>
+      </section>
+      <section class="panel video ${l.video ? 'has' : ''}">
+        <span class="play" aria-hidden="true">▶</span>
+        ${l.video ? `<div><b>Video walkthrough</b><div class="dim" style="font-size:13px">A short recording of this lesson on Bubbles.</div></div><a class="btn" href="${esc(l.video)}" target="_blank" rel="noopener">Watch on Bubbles ↗</a>`
+          : `<div><b>Video coming soon</b><div class="dim" style="font-size:13px">A short Bubbles walkthrough will appear here once it's recorded.</div></div>`}
+      </section>
+      <div class="two">
+        ${l.objectives.length ? `<section class="group"><header><h3>In this lesson you will</h3></header><div class="body"><ul class="clean">${l.objectives.map((o) => `<li>${esc(o)}</li>`).join('')}</ul></div></section>` : ''}
+        <section class="group"><header><h3>Key ideas</h3></header><div class="body"><ul class="clean">${l.concepts.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></div></section>
+        ${l.sections.length ? `<section class="group"><header><h3>Lesson outline</h3><span class="meta">from the full lesson</span></header><div class="body"><ol class="steps">${l.sections.map((s) => `<li>${esc(s)}</li>`).join('')}</ol></div></section>` : ''}
+      </div>
+      ${snippets.length ? `<section><h3 class="section-title">Prompts and commands</h3><div class="snippets">${snippets.map((p, i) => snippetHTML(p, i, `${KIND_LABEL[p.kind] || 'Snippet'}${p.section ? ' · ' + esc(p.section) : ''}`)).join('')}</div></section>` : ''}
+      <section><h3 class="section-title">Check your understanding</h3><div class="qs">${l.questions.map((q) => questionHTML(q, false)).join('')}</div></section>
+      <nav class="pager" aria-label="Lesson navigation">
+        ${prev ? `<a class="btn" href="#${prev}">← ${esc(DATA.lessons[prev].title)}</a>` : '<span></span>'}
+        ${next ? `<a class="btn" href="#${next}">${esc(DATA.lessons[next].title)} →</a>` : `<a class="btn" href="#quiz-${t.id}">Take the ${esc(t.name)} quiz →</a>`}
+      </nav>
+      <p class="dim" style="font-size:12px;margin:0">Source: <a href="${esc(l.sourceUrl)}" target="_blank" rel="noopener">${esc(l.file)}</a></p>`;
+    view.querySelector('[data-done]').addEventListener('click', () => {
+      state.done[id] = !state.done[id]; if (!state.done[id]) delete state.done[id]; save();
+      toast(state.done[id] ? 'Lesson marked as done' : 'Lesson marked as not done');
+      render();
+    });
+    view.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', () => copy(snippets[+b.dataset.copy].text, b)));
+    onAnswer = () => {};
+    mountQuestions(view, l.questions);
+  }
+
+  const promptFilter = { q: '', track: 'all', kind: 'all' };
+  function prompts() {
+    const kinds = ['prompt', 'issue', 'instructions', 'slash'];
+    view.innerHTML = `
+      <section class="lesson-head"><span class="eyebrow">Prompt library</span><h2>Every prompt from the workshop</h2>
+        <p class="lead dim">Search by words in the prompt or the lesson, filter by track or type, and copy with one click.</p></section>
+      <section class="filters">
+        <div class="search"><label class="dim" for="prompt-search" style="font-size:12px">Search prompts</label><input id="prompt-search" type="search" placeholder="e.g. playwright, pull request, high contrast" value="${esc(promptFilter.q)}" autocomplete="off"></div>
+        <div class="seg" aria-label="Track" id="seg-track">${[['all', 'All tracks']].concat(DATA.tracks.map((t) => [t.id, t.name])).map(([v, n]) => `<button data-v="${v}" aria-pressed="${promptFilter.track === v}">${esc(n)}</button>`).join('')}</div>
+        <div class="seg" aria-label="Type" id="seg-kind">${[['all', 'All types']].concat(kinds.map((k) => [k, KIND_LABEL[k]])).map(([v, n]) => `<button data-v="${v}" aria-pressed="${promptFilter.kind === v}">${esc(n)}</button>`).join('')}</div>
+      </section>
+      <p class="dim" id="prompt-count" style="margin:0;font-size:13px"></p>
+      <div class="snippets" id="prompt-list"></div>`;
+    const list = view.querySelector('#prompt-list');
+    function paint() {
+      const needle = promptFilter.q.trim().toLowerCase();
+      const hits = DATA.prompts.filter((p) => (promptFilter.track === 'all' || p.track === promptFilter.track) && (promptFilter.kind === 'all' || p.kind === promptFilter.kind)
+        && (!needle || (p.text + ' ' + p.lessonTitle + ' ' + p.section).toLowerCase().includes(needle)));
+      view.querySelector('#prompt-count').textContent = `${plural(hits.length, 'result')}`;
+      const mark = (s) => { const e = esc(s); if (!needle) return e; const n = esc(needle).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); return e.replace(new RegExp(n, 'gi'), (m) => `<mark>${m}</mark>`); };
+      list.innerHTML = hits.length ? hits.map((p, i) => snippetHTML({ text: p.text, html: mark(p.text) }, i,
+        `${KIND_LABEL[p.kind]} · <a href="#${p.lesson}">${esc(tracksById[p.track].name)} ${DATA.lessons[p.lesson].num}: ${esc(p.lessonTitle)}</a>`)).join('')
+        : `<div class="empty">No prompts match "${esc(promptFilter.q)}". Try a shorter word or clear the filters.</div>`;
+      list.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', () => copy(hits[+b.dataset.copy].text, b)));
+    }
+    view.querySelector('#prompt-search').addEventListener('input', (e) => { promptFilter.q = e.target.value; paint(); });
+    for (const [segId, key] of [['#seg-track', 'track'], ['#seg-kind', 'kind']]) {
+      view.querySelectorAll(`${segId} button`).forEach((b) => b.addEventListener('click', () => {
+        promptFilter[key] = b.dataset.v;
+        view.querySelectorAll(`${segId} button`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        paint();
+      }));
+    }
+    paint();
+  }
+
+  function cheatsheets() {
+    const fmt = (cell) => esc(cell).replace(/(^|\s|,)((?:\/|\.|~\/)[\w./<>*@\-]+|copilot --[\w -]+|--[\w-]+)/g, (m, pre, code) => `${pre}<code>${code}</code>`);
+    view.innerHTML = `
+      <section class="lesson-head"><span class="eyebrow">Cheat sheets</span><h2>Quick reference</h2>
+        <p class="lead dim">Paths, commands and rules from all four tracks on one page.</p></section>
+      ${DATA.cheatsheets.map((c) => `<section class="group" id="cs-${c.id}"><header><h3>${esc(c.title)}</h3></header>
+        <div class="body dim" style="font-size:13px">${fmt(c.intro)}</div>
+        <div class="table-wrap"><table><thead><tr>${c.columns.map((h) => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead>
+        <tbody>${c.rows.map((r) => `<tr>${r.map((cell) => `<td>${fmt(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`).join('')}`;
+  }
+
+  function scriptHTML(s) {
+    return `<div class="why" style="margin-top:0">
+      <span><b>Open with:</b> ${esc(s.hook)}</span>
+      <span><b>Show on screen:</b></span><ol class="clean">${s.show.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>
+      <span><b>Say:</b></span><ul class="clean">${s.say.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      ${s.demo ? `<span><b>Demo prompt:</b></span><pre style="margin:0;white-space:pre-wrap;font-size:12.5px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 10px">${esc(s.demo)}</pre>` : ''}
+      <span><b>Close with:</b> ${esc(s.close)}</span></div>`;
+  }
+
+  function videos() {
+    const all = Object.values(DATA.lessons);
+    const recorded = all.filter((l) => l.video).length;
+    view.innerHTML = `
+      <section class="lesson-head"><span class="eyebrow">Video library</span><h2>Lesson walkthroughs</h2>
+        <p class="lead dim">One short Bubbles video per lesson. Lessons without a recording yet include a two-minute script to record from.</p>
+        <div class="chips"><span class="chip">${recorded} of ${all.length} recorded</span></div></section>
+      ${DATA.tracks.map((t) => `<section class="group"><header><h3>${esc(t.name)}</h3><span class="meta">${t.lessons.filter((id) => DATA.lessons[id].video).length}/${t.lessons.length} recorded</span></header>
+        ${t.lessons.map((id) => { const l = DATA.lessons[id]; return `<div class="lesson-row" style="grid-template-columns:22px 22px minmax(0,1fr) auto">
+          <span class="tick ${l.video ? 'on' : ''}" aria-hidden="true">▶</span><span class="n">${l.num}</span>
+          <span class="t"><a href="#${id}" style="color:var(--text)">${esc(l.title)}</a>
+            ${l.video ? '' : `<details style="margin-top:6px"><summary class="dim" style="cursor:pointer;font-size:12px">Recording script</summary>${scriptHTML(l.script)}</details>`}</span>
+          ${l.video ? `<a class="btn" href="${esc(l.video)}" target="_blank" rel="noopener">Watch ↗</a>` : '<span class="m">Not recorded</span>'}</div>`; }).join('')}
+      </section>`).join('')}`;
+  }
+
+  function quiz(trackId) {
+    const t = tracksById[trackId];
+    const qs = t.lessons.flatMap((id) => DATA.lessons[id].questions);
+    view.innerHTML = `
+      <section class="lesson-head"><span class="eyebrow">${esc(t.name)} · Track quiz</span><h2>${esc(t.name)} quiz</h2>
+        <p class="lead dim">${plural(qs.length, 'question')} covering every lesson in the track. Answers you gave on lesson pages count here too.</p></section>
+      <section class="panel score"><span class="big" id="score"></span><div style="flex:1;min-width:160px"><div class="bar"><i id="score-bar"></i></div><div class="dim" id="score-note" style="font-size:13px;margin-top:6px"></div></div><button class="btn" id="reset">Clear my answers</button></section>
+      <div class="qs">${qs.map((q) => questionHTML(q, true)).join('')}</div>`;
+    const paintScore = () => {
+      const answered = qs.filter(isAnswered).length, right = qs.filter(isCorrect).length;
+      view.querySelector('#score').textContent = `${right} / ${qs.length}`;
+      view.querySelector('#score-bar').style.width = `${(100 * right / qs.length).toFixed(1)}%`;
+      view.querySelector('#score-note').textContent = answered === qs.length ? (right === qs.length ? 'Perfect score. Nicely done.' : `All answered. Use Try again on any you missed.`) : `${answered} of ${qs.length} answered`;
+    };
+    view.querySelector('#reset').addEventListener('click', () => { qs.forEach((q) => delete state.answers[q.id]); save(); quiz(trackId); toast('Answers cleared'); });
+    onAnswer = paintScore;
+    mountQuestions(view, qs);
+    paintScore();
+  }
+
+  // ---- Router ----
+  function render() {
+    const hash = decodeURIComponent(location.hash.slice(1)) || 'home';
+    let active = 'home';
+    if (DATA.lessons[hash]) { lesson(hash); active = ''; }
+    else if (hash === 'prompts') { prompts(); active = 'prompts'; }
+    else if (hash === 'cheatsheets') { cheatsheets(); active = 'cheatsheets'; }
+    else if (hash === 'videos') { videos(); active = 'videos'; }
+    else if (hash.startsWith('quiz-') && tracksById[hash.slice(5)]) { quiz(hash.slice(5)); active = ''; }
+    else home();
+    document.querySelectorAll('.nav a').forEach((a) => {
+      if (a.dataset.view === active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    renderRail(DATA.lessons[hash] ? hash : null);
+    renderProgress();
+  }
+  let lastHash = location.hash;
+  window.addEventListener('hashchange', () => { render(); if (location.hash !== lastHash) { window.scrollTo(0, 0); view.focus({ preventScroll: true }); } lastHash = location.hash; });
+  render();
+})();
+</script>

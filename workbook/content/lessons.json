@@ -1,0 +1,1491 @@
+{
+  "cli-0": {
+    "sourceHash": "81053509397c",
+    "summary": "Create your own copy of Tailspin Toys from the template and start a codespace. Its terminal is where you'll install and run Copilot CLI.",
+    "concepts": [
+      "Creating a repository from the template also seeds a backlog of GitHub issues you'll work from.",
+      "A codespace (or the same dev container locally) ships every prerequisite, so everyone starts from an identical environment.",
+      "Note your repository path (owner/repo); later lessons refer to it."
+    ],
+    "questions": [
+      {
+        "q": "Where does the backlog of issues you work from come from?",
+        "options": [
+          "The template creates it automatically with your repository",
+          "You file the issues yourself in the next exercise",
+          "Copilot CLI generates them the first time it starts",
+          "They're copied from pull requests in the github-samples repository"
+        ],
+        "why": "Creating the repository from the template seeds the backlog for you; there's nothing to file."
+      },
+      {
+        "q": "Why does the workshop run in a codespace or dev container?",
+        "options": [
+          "It has every prerequisite pre-installed, so the environment is consistent",
+          "Copilot CLI only runs inside a browser",
+          "Astro can't run on a local machine",
+          "A codespace is required to sign in to GitHub"
+        ],
+        "why": "Both give a known-good environment. Locally, Reopen in Container builds the same dev container the codespace uses."
+      }
+    ]
+  },
+  "cli-1": {
+    "sourceHash": "51aeaaa2d2f7",
+    "summary": "Install Copilot CLI with npm, sign in with a device code, trust the workshop folder and confirm Copilot answers a first question.",
+    "concepts": [
+      "Copilot CLI needs Node.js 22 or newer; install it with npm install -g @github/copilot (WinGet and Homebrew also work).",
+      "On first launch you authenticate with a device code in the browser; in a codespace you may already be signed in.",
+      "Folder trust controls file access: trust once, remember the folder, or exit.",
+      "/help lists every slash command and keyboard shortcut."
+    ],
+    "questions": [
+      {
+        "q": "Which command does the lesson use to install Copilot CLI in the codespace?",
+        "options": [
+          "npm install -g @github/copilot",
+          "npx copilot init",
+          "gh extension install github/copilot",
+          "pip install github-copilot"
+        ],
+        "why": "Codespaces come with Node.js, so the lesson installs the CLI globally with npm."
+      },
+      {
+        "q": "What's the minimum Node.js version Copilot CLI needs?",
+        "options": [
+          "22",
+          "16",
+          "18",
+          "20"
+        ],
+        "why": "node --version should report v22.x.x or higher."
+      },
+      {
+        "q": "Which trust option does the lesson pick for the workshop repository?",
+        "options": [
+          "Yes, and remember this folder for future sessions",
+          "Yes, proceed (this session only)",
+          "No, exit (Esc)",
+          "Trust all folders on this machine"
+        ],
+        "why": "You'll work in this repository throughout, so remembering the folder avoids being asked again."
+      }
+    ]
+  },
+  "cli-2": {
+    "sourceHash": "8430659729d3",
+    "summary": "See how repository and path-scoped instruction files shape what Copilot writes. You generate a publishers helper, add a TSDoc standard, then regenerate and watch the code follow it.",
+    "concepts": [
+      ".github/copilot-instructions.md is sent with every request; keep it to project-level context and global standards.",
+      ".github/instructions/*.instructions.md files target file types or tasks through an applyTo glob.",
+      "Instruction files can link to other files; those paths are relative to the instruction file, not the repo root.",
+      "Copilot is non-deterministic: judge the trend after an instruction change, not character-for-character output.",
+      "Copilot also reads AGENTS.md and CLAUDE.md, and /init in the CLI can scaffold instructions."
+    ],
+    "questions": [
+      {
+        "q": "Which file is sent to Copilot with every request in the repository?",
+        "options": [
+          ".github/copilot-instructions.md",
+          ".github/instructions/unit-tests.instructions.md",
+          ".github/agents/accessibility.md",
+          "README.md"
+        ],
+        "why": "The repository-level instructions file applies to every chat, CLI and cloud agent request."
+      },
+      {
+        "q": "What does the applyTo field at the top of a *.instructions.md file do?",
+        "options": [
+          "Sets a glob that decides which files the instructions apply to",
+          "Lists the agents allowed to read the file",
+          "Picks the branch the instructions apply to",
+          "Marks the file as required for every request"
+        ],
+        "why": "unit-tests.instructions.md, for example, applies to TypeScript test files such as **/*.test.ts."
+      },
+      {
+        "q": "A link inside drizzle.instructions.md points to another file. What is that path relative to?",
+        "options": [
+          "The instruction file itself",
+          "The repository root",
+          "The terminal's current directory",
+          "~/.copilot"
+        ],
+        "why": "Paths in instruction files resolve from the instruction file's own location."
+      },
+      {
+        "q": "After you add the TSDoc rule, one regenerated function still lacks a doc comment. What's the right conclusion?",
+        "options": [
+          "Copilot is non-deterministic; look at the overall trend and tighten the wording if needed",
+          "The instructions file is being ignored and must be deleted",
+          "Instructions only apply after the codespace restarts",
+          "Instructions only affect inline code completions"
+        ],
+        "why": "The lesson warns that output varies; the point is the consistent shift after the instruction change."
+      },
+      {
+        "q": "Which Copilot CLI command can generate instruction files for you?",
+        "options": [
+          "/init",
+          "/plan",
+          "/share",
+          "/compact"
+        ],
+        "why": "Each surface has its own way; in Copilot CLI it's /init."
+      }
+    ]
+  },
+  "cli-3": {
+    "sourceHash": "4da0a87aec33",
+    "summary": "Use /plan to have Copilot read the filtering issue and draft a plan, refine it, let it build in autopilot, then review every change with /diff.",
+    "concepts": [
+      "Start the session with copilot --yolo --enable-all-github-mcp-tools; add --continue to resume your last session.",
+      "--yolo allows all tools, paths and URLs. Use it only in an isolated environment such as a codespace or VM, and never alias it for daily work.",
+      "Plan mode asks clarifying questions and lays out the work, so the generated code better matches the requirements.",
+      "Autopilot works through each step without waiting for input until it judges the task complete.",
+      "All AI-generated code is reviewed before merge; /diff shows every changed file."
+    ],
+    "questions": [
+      {
+        "q": "What does the --yolo flag turn on?",
+        "options": [
+          "Full automatic permissions: all tools, all paths and all URLs",
+          "A faster, lower-cost model",
+          "Read-only mode",
+          "Automatic pull request creation"
+        ],
+        "why": "--yolo is shorthand for --allow-all-tools, --allow-all-paths and --allow-all-urls."
+      },
+      {
+        "q": "Where is it appropriate to run Copilot CLI with --yolo?",
+        "options": [
+          "Only in an isolated environment like a codespace or VM",
+          "As your default alias for everyday work",
+          "Anywhere, as long as you're on the main branch",
+          "Anywhere, because every action can be undone"
+        ],
+        "why": "Full permissions are only safe where the blast radius is contained."
+      },
+      {
+        "q": "Why begin the filtering work with /plan?",
+        "options": [
+          "Copilot surfaces questions and gaps first, so the code better matches the requirements",
+          "It's the only way Copilot can read GitHub issues",
+          "It skips running the tests to save time",
+          "It makes Copilot's output deterministic"
+        ],
+        "why": "Time spent planning helps Copilot generate code that matches what you asked for."
+      },
+      {
+        "q": "Which command reviews the changes Copilot made, inside the CLI?",
+        "options": [
+          "/diff",
+          "/context",
+          "/share",
+          "/session"
+        ],
+        "why": "/diff shows the changed files; arrow keys move between them."
+      },
+      {
+        "type": "order",
+        "q": "Put the CLI feature workflow in order.",
+        "items": [
+          "Start a plan with /plan and point it at the issue",
+          "Answer Copilot's follow-up questions",
+          "Review the plan and add feedback",
+          "Approve it and let Copilot build in autopilot",
+          "Review the changes with /diff"
+        ],
+        "why": "Plan, refine, build, then review: the same order a careful developer follows."
+      }
+    ]
+  },
+  "cli-4": {
+    "sourceHash": "6e252d1b0856",
+    "summary": "Learn what MCP is, add the Playwright MCP server with /mcp add, start the app, and have Copilot drive a real browser to check the filtering feature.",
+    "concepts": [
+      "MCP servers give agents tools (actions) and resources (up-to-date information) from outside the editor.",
+      "The GitHub MCP server is built in to Copilot CLI; Playwright is added as a second, local server.",
+      "Treat MCP servers like any dependency: review the source, verify the publisher, limit sensitive access.",
+      "--headless runs the browser without a window, which a codespace needs because it has no desktop.",
+      "/mcp add writes to ~/.copilot/mcp-config.json; /mcp show lists active servers.",
+      "Playwright MCP reads the page's accessibility tree, so a functional check doubles as a light accessibility check."
+    ],
+    "questions": [
+      {
+        "q": "In MCP, how do tools differ from resources?",
+        "options": [
+          "Tools perform actions; resources provide up-to-date information",
+          "Resources perform actions; tools provide information",
+          "They're two names for MCP servers",
+          "Resources are paid tools"
+        ],
+        "why": "Agents read resources and call tools, both through an MCP server."
+      },
+      {
+        "q": "Why is the Playwright server started with --headless in a codespace?",
+        "options": [
+          "There's no desktop to display a browser window",
+          "It makes the tests run in parallel",
+          "It turns off network access",
+          "GitHub authentication requires it"
+        ],
+        "why": "Headless mode runs the browser without a visible window."
+      },
+      {
+        "q": "Where does /mcp add save the server configuration?",
+        "options": [
+          "~/.copilot/mcp-config.json",
+          ".vscode/mcp.json",
+          ".github/mcp.yml",
+          "package.json"
+        ],
+        "why": "Copilot CLI keeps MCP servers in your user-level config file."
+      },
+      {
+        "q": "How does the Playwright MCP server understand a page?",
+        "options": [
+          "Through the page's accessibility tree",
+          "Through screenshots and OCR",
+          "From the raw HTML source only",
+          "From the Astro build output"
+        ],
+        "why": "It reasons over labelled elements the way assistive technology does."
+      },
+      {
+        "q": "Which MCP server works in Copilot CLI with no setup?",
+        "options": [
+          "GitHub",
+          "Playwright",
+          "Azure",
+          "None; every server must be added"
+        ],
+        "why": "That built-in server is how Copilot reads your backlog and opens PRs."
+      },
+      {
+        "type": "order",
+        "q": "Put the steps for testing with Playwright MCP in order.",
+        "items": [
+          "Run /mcp add",
+          "Fill in name playwright, type Local, command npx @playwright/mcp@latest --headless",
+          "Save with Ctrl+S",
+          "Confirm with /mcp show",
+          "Start the app with npm run dev in a separate terminal",
+          "Ask Copilot to test the feature with the Playwright MCP server"
+        ],
+        "why": "Register the server, confirm it, run the app, then ask for the test."
+      }
+    ]
+  },
+  "cli-5": {
+    "sourceHash": "dc9dec87353a",
+    "summary": "Explore the make-contribution skill, then ask Copilot to create a pull request. It loads the skill on its own and follows the team's PR rules.",
+    "concepts": [
+      "A skill is a folder with a SKILL.md (name and description frontmatter) plus optional scripts and resources.",
+      "Skills live in .github/skills in a project or ~/.copilot/skills globally.",
+      "The agent loads a skill on demand by matching your request to its description, so write a clear, scenario-specific description.",
+      "Agent Skills is an open standard; the same skill works in VS Code agent mode, cloud agent, Copilot CLI and the Copilot app."
+    ],
+    "questions": [
+      {
+        "q": "How does Copilot decide which skill to use?",
+        "options": [
+          "It matches your request against each skill's description",
+          "It runs skills in alphabetical order",
+          "You must always name the skill in your prompt",
+          "Every skill runs on every request"
+        ],
+        "why": "A vague description is the difference between a skill that's used and one that's ignored."
+      },
+      {
+        "q": "Which frontmatter does a SKILL.md need?",
+        "options": [
+          "name and description",
+          "name and applyTo",
+          "model and tools",
+          "title and version"
+        ],
+        "why": "The name identifies the skill and the description tells the agent when to use it."
+      },
+      {
+        "q": "Where can skills live?",
+        "options": [
+          ".github/skills in the project, or ~/.copilot/skills globally",
+          ".github/agents only",
+          ".vscode/skills",
+          "The scripts section of package.json"
+        ],
+        "why": "Project skills are shared with the team; global ones follow you."
+      },
+      {
+        "q": "Which skill handled \"Can you please create a pull request for me!\"?",
+        "options": [
+          "make-contribution",
+          "quality-checks",
+          "accessibility",
+          "publish-to-pages"
+        ],
+        "why": "Its description covers commits, pushes and PRs, so it ran the tests, branched, committed and opened the PR."
+      }
+    ]
+  },
+  "cli-6": {
+    "sourceHash": "83e312147798",
+    "summary": "Review the accessibility custom agent, select it with /agent, and have it implement a persisted high-contrast toggle with end-to-end tests and a PR.",
+    "concepts": [
+      "Custom agents are Markdown files in .github/agents (or ~/.copilot/agents) with required name and description frontmatter.",
+      "A custom agent is the worker; skills are its tools.",
+      "Custom agents have their own context window and can orchestrate skills and other agents.",
+      "Teams use them to codify expertise: accessibility, security, testing."
+    ],
+    "questions": [
+      {
+        "q": "Which statement matches how the lesson separates custom agents and skills?",
+        "options": [
+          "A custom agent is the worker; skills are tools it can use",
+          "A skill is the worker; agents are tools it can use",
+          "They're the same thing with different file names",
+          "Skills can call agents, but agents can't use skills"
+        ],
+        "why": "The accessibility agent even used the PR skill when it opened its pull request."
+      },
+      {
+        "q": "What frontmatter is required in a custom agent file?",
+        "options": [
+          "name and description",
+          "name and applyTo",
+          "tools and model",
+          "No frontmatter is required"
+        ],
+        "why": "The lesson calls this out as required."
+      },
+      {
+        "q": "How do you choose a custom agent in Copilot CLI?",
+        "options": [
+          "/agent",
+          "/skills",
+          "/model",
+          "/delegate"
+        ],
+        "why": "/agent lists the agents available to the session."
+      },
+      {
+        "q": "Where are the project's custom agents defined?",
+        "options": [
+          ".github/agents",
+          ".github/instructions",
+          ".github/skills",
+          ".github/workflows"
+        ],
+        "why": "Global agents go in ~/.copilot/agents."
+      }
+    ]
+  },
+  "cli-7": {
+    "sourceHash": "d7cb225731de",
+    "summary": "Share a session as a gist, inspect and compact the context window, switch models, and optionally hand work to cloud agent with /delegate.",
+    "concepts": [
+      "/share creates a Markdown file or GitHub gist of the session, including prompts, skills and agents used.",
+      "/context shows System/Tools, Messages, Buffer and Free space.",
+      "Copilot compacts automatically near the limit. Use /clear for an unrelated task and /compact to choose when to compact.",
+      "/model lists models with their cost-per-request multiplier; the choice persists.",
+      "/delegate sends the session to cloud agent, which works asynchronously and opens a PR (all plans except Copilot Free)."
+    ],
+    "questions": [
+      {
+        "q": "You're switching to an unrelated part of the app. Which command keeps old context from confusing Copilot?",
+        "options": [
+          "/clear",
+          "/compact",
+          "/context",
+          "/share"
+        ],
+        "why": "/clear starts fresh; /compact only summarizes."
+      },
+      {
+        "q": "What does /compact do?",
+        "options": [
+          "Summarizes the conversation history to free context space",
+          "Deletes the session permanently",
+          "Switches to a smaller model",
+          "Compresses the files in your repository"
+        ],
+        "why": "It lets you control when compaction happens instead of waiting for the automatic one."
+      },
+      {
+        "q": "In the /context view, what is the Buffer?",
+        "options": [
+          "Space reserved for generating responses",
+          "Your conversation history",
+          "Instruction files and tool definitions",
+          "Unused free space"
+        ],
+        "why": "System/Tools, Messages, Buffer and Free space make up the window."
+      },
+      {
+        "q": "Where does /delegate send your session?",
+        "options": [
+          "To Copilot cloud agent, which works asynchronously and opens a PR",
+          "To a teammate by email",
+          "To a GitHub gist",
+          "To a new local terminal"
+        ],
+        "why": "You keep working while cloud agent takes the longer task; track it at github.com/copilot/agents."
+      },
+      {
+        "q": "Which plan can't use /delegate?",
+        "options": [
+          "Copilot Free",
+          "Copilot Student",
+          "Copilot Pro",
+          "Copilot Business"
+        ],
+        "why": "Cloud agent is on every plan except Copilot Free."
+      }
+    ]
+  },
+  "cli-8": {
+    "sourceHash": "50a35e2c3b2b",
+    "summary": "Recap the CLI harness with a reference table of slash commands, the best practices that matter most, and where to go next.",
+    "concepts": [
+      "Instruction files, custom agents and skills drive output quality; awesome-copilot has templates.",
+      "Context still matters: say what you want built, why, and how.",
+      "/plan, /review, /diff, /session, /usage and /add-dir round out the everyday commands."
+    ],
+    "questions": [
+      {
+        "q": "What does /plan <prompt> do?",
+        "options": [
+          "Creates an implementation plan before coding",
+          "Schedules a prompt to run later",
+          "Shows your Copilot plan and billing",
+          "Lists open issues"
+        ],
+        "why": "It's the same plan mode you used for filtering."
+      },
+      {
+        "q": "Which command adds a directory to Copilot's trusted list?",
+        "options": [
+          "/add-dir",
+          "/session",
+          "/usage",
+          "/skills"
+        ],
+        "why": "Trust controls which folders Copilot can read and write."
+      },
+      {
+        "q": "Besides instructions, agents and skills, what changes output quality the most?",
+        "options": [
+          "Clearly describing what you want, why, and how",
+          "Always choosing the most expensive model",
+          "Keeping prompts under ten words",
+          "Running everything in autopilot"
+        ],
+        "why": "If a piece of information would help Copilot, pass it along."
+      }
+    ]
+  },
+  "vscode-0": {
+    "sourceHash": "316c21f9876e",
+    "summary": "Create your Tailspin Toys copy, start a codespace, and confirm GitHub Copilot Chat is installed and signed in.",
+    "concepts": [
+      "The template seeds your backlog of issues automatically.",
+      "Codespaces include the Copilot Chat extension; elsewhere, install GitHub Copilot Chat from the Marketplace.",
+      "Send a first message in Copilot Chat to activate it, signing in if prompted."
+    ],
+    "questions": [
+      {
+        "q": "Copilot Chat isn't in your editor. What do you do?",
+        "options": [
+          "Install GitHub Copilot Chat from the Extensions view or Marketplace",
+          "Run npm install -g @github/copilot",
+          "Recreate the repository from the template",
+          "Enable Copilot in repository settings"
+        ],
+        "why": "Codespaces usually have it already; otherwise install the extension and sign in."
+      },
+      {
+        "q": "What should you record after creating the repository?",
+        "options": [
+          "Its path, owner/repository-name",
+          "The codespace's machine type",
+          "Your Copilot plan's renewal date",
+          "The template's commit SHA"
+        ],
+        "why": "Later exercises refer to your repository path."
+      }
+    ]
+  },
+  "vscode-1": {
+    "sourceHash": "9b260d1161e6",
+    "summary": "Learn instruction files in Copilot Chat: send a prompt, add a TSDoc standard, resend the same prompt, then have Copilot create and merge the PR for you.",
+    "concepts": [
+      "In the IDE, instruction files apply to Copilot Chat code generation, not to completions or next-edit suggestions.",
+      "Repository instructions apply to every request; *.instructions.md files scope by applyTo glob.",
+      "Configure Chat → Generate Agent Instructions drafts instructions for you in VS Code.",
+      "Copilot can find the issue, open the PR and merge it with the GitHub tools wired into the template; you approve each action with Allow."
+    ],
+    "questions": [
+      {
+        "q": "In VS Code, where are instruction files used?",
+        "options": [
+          "Code generation in Copilot Chat",
+          "Inline code completions",
+          "Next edit suggestions",
+          "All of Copilot's features equally"
+        ],
+        "why": "The lesson notes they don't apply to completions or next-edit suggestions."
+      },
+      {
+        "q": "Where in VS Code can Copilot draft instruction files for you?",
+        "options": [
+          "Configure Chat → Generate Agent Instructions",
+          "/init in the integrated terminal",
+          "Command Palette → Format Document",
+          "Settings → Extensions → Copilot"
+        ],
+        "why": "/init is the Copilot CLI equivalent."
+      },
+      {
+        "q": "unit-tests.instructions.md has applyTo set for test files. Which file does it apply to?",
+        "options": [
+          "src/lib/games.test.ts",
+          "src/lib/games.ts",
+          "astro.config.mjs",
+          ".github/copilot-instructions.md"
+        ],
+        "why": "Its glob matches TypeScript test files such as **/*.test.ts."
+      },
+      {
+        "q": "Why merge the instructions change to main before the next exercise?",
+        "options": [
+          "The next exercise branches from main, so the new standard must be there",
+          "Copilot only reads instructions from tagged releases",
+          "Unmerged instruction files are deleted after 24 hours",
+          "VS Code can't open files on other branches"
+        ],
+        "why": "Committing it to main means the updated guidance is in place for the agent-mode work."
+      }
+    ]
+  },
+  "vscode-2": {
+    "sourceHash": "a02a7e89d317",
+    "summary": "Run the site, have agent mode list and prioritize the backlog, attach the UI instructions, then build filtering across the data layer, UI and tests until everything passes.",
+    "concepts": [
+      "Agent mode explores the project, edits multiple files, runs tasks like tests and fixes its own mistakes.",
+      "Agent mode works in your IDE with fast feedback; cloud agent works asynchronously through issues and PRs.",
+      "Tailspin Toys is one Astro app; pages query SQLite through Drizzle in their frontmatter, and helpers live in src/lib/.",
+      "Add Context → Instructions attaches a specific instructions file such as ui.",
+      "Review, then select Keep for all changes at the end; Continue approves commands the agent wants to run."
+    ],
+    "questions": [
+      {
+        "q": "How does agent mode differ from cloud agent?",
+        "options": [
+          "Agent mode works in your IDE with quick feedback; cloud agent works asynchronously through issues and PRs",
+          "Agent mode only answers questions; cloud agent writes code",
+          "They're the same feature with two names",
+          "Cloud agent runs on your laptop; agent mode runs on GitHub"
+        ],
+        "why": "Cloud agent acts like a peer programmer you hand issues to."
+      },
+      {
+        "q": "How did you give Copilot the UI guidance for the filtering task?",
+        "options": [
+          "Add Context → Instructions → ui",
+          "Pasted the file into the prompt",
+          "Renamed it to copilot-instructions.md",
+          "Selected a different model"
+        ],
+        "why": "Attaching the instructions file adds its guidance and linked files to the request."
+      },
+      {
+        "q": "When should you select Keep?",
+        "options": [
+          "After the agent finishes and you've reviewed and tried the changes",
+          "On every edit as soon as it appears",
+          "Before the agent starts",
+          "Never; changes are saved automatically"
+        ],
+        "why": "You get one Keep or Undo for all changes at the end; there's no need to click while work is in progress."
+      },
+      {
+        "q": "Some tests fail while the agent works. What does that mean?",
+        "options": [
+          "It's normal; the agent iterates between code and tests until they pass",
+          "The agent has crashed and must be restarted",
+          "You should select Undo immediately",
+          "The instructions file is wrong"
+        ],
+        "why": "Agent mode goes back and forth until it detects no errors."
+      },
+      {
+        "q": "Which describes the Tailspin Toys architecture?",
+        "options": [
+          "A single Astro app querying SQLite through Drizzle",
+          "A React single-page app with an Express API",
+          "A Flask backend with an Astro frontend",
+          "Next.js with Prisma and PostgreSQL"
+        ],
+        "why": "There's no separate backend API or client-side framework."
+      }
+    ]
+  },
+  "vscode-3": {
+    "sourceHash": "64ca8043f73f",
+    "summary": "Review .vscode/mcp.json, add the local Playwright server next to the remote GitHub server, test filtering in a browser, then publish the branch and have Copilot open the PR.",
+    "concepts": [
+      ".vscode/mcp.json configures the workspace's MCP servers.",
+      "The github server is remote over HTTP (api.githubcopilot.com/mcp/); nothing is installed locally.",
+      "The playwright server is local: VS Code runs npx @playwright/mcp@latest --headless.",
+      "VS Code starts servers on demand and asks you to trust them first.",
+      "The Sparkle button in Source Control drafts the commit message."
+    ],
+    "questions": [
+      {
+        "q": "Which file configures MCP servers for this VS Code workspace?",
+        "options": [
+          ".vscode/mcp.json",
+          "~/.copilot/mcp-config.json",
+          ".github/copilot-instructions.md",
+          "package.json"
+        ],
+        "why": "~/.copilot/mcp-config.json is Copilot CLI's file."
+      },
+      {
+        "q": "How does the github server in mcp.json run?",
+        "options": [
+          "Remotely over HTTP, with nothing installed locally",
+          "As a local npx process",
+          "In a Docker container",
+          "As a separate VS Code extension"
+        ],
+        "why": "You authenticate with GitHub the first time Copilot uses one of its tools."
+      },
+      {
+        "q": "When does VS Code start an MCP server?",
+        "options": [
+          "On demand, after you trust it, the first time Copilot needs its tools (or when you select Start)",
+          "Every time the codespace boots",
+          "Only after you restart VS Code",
+          "When you commit mcp.json"
+        ],
+        "why": "Starting it by hand is optional."
+      },
+      {
+        "q": "What drafts a commit message for you in Source Control?",
+        "options": [
+          "The Sparkle button",
+          "The Publish button",
+          "Ctrl+Enter",
+          "The Keep button"
+        ],
+        "why": "Copilot writes the message from the staged changes."
+      }
+    ]
+  },
+  "vscode-4": {
+    "sourceHash": "b2c9f2e7dfa2",
+    "summary": "Branch off main, review the accessibility custom agent, pick it from the agents dropdown, and ask it for a persisted high-contrast toggle.",
+    "concepts": [
+      "VS Code lists every agent in .github/agents in the agents dropdown at the bottom of Chat.",
+      "Selecting a custom agent scopes the chat to its instructions and tooling.",
+      "Each edit appears inline with a diff; the Files changed indicator tracks the working set.",
+      "Keep accessibility work on its own branch, separate from the open filtering PR."
+    ],
+    "questions": [
+      {
+        "q": "Where do custom agents appear in VS Code?",
+        "options": [
+          "In the agents dropdown at the bottom of the Chat view",
+          "In the Extensions view",
+          "In the Command Palette under Tasks",
+          "In Source Control"
+        ],
+        "why": "The dropdown shows the active agent, default unless you pick another."
+      },
+      {
+        "q": "Why create a fresh branch off main for the accessibility work?",
+        "options": [
+          "To keep it separate from the filtering PR that's still open",
+          "Custom agents only work on new branches",
+          "main is locked during the workshop",
+          "VS Code requires one branch per agent"
+        ],
+        "why": "Separate branches keep each PR focused and reviewable."
+      },
+      {
+        "q": "True or false: custom agents have their own context window and can orchestrate skills and other agents.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "why": "That's what makes them suited to larger, multi-step work."
+      }
+    ]
+  },
+  "vscode-5": {
+    "sourceHash": "d47a7f3c011f",
+    "summary": "Watch the agent's tool calls, keep or undo each diff, then steer the same session to add light mode next to high contrast.",
+    "concepts": [
+      "Chat shows each file read, edit and terminal command as it happens.",
+      "Keep accepts a diff; Undo reverts it so the agent can try again.",
+      "Commands that need permission pause on Allow; approve only what you're comfortable with.",
+      "Continuing the same session keeps the agent's context; Stop halts a wrong direction so you can clarify."
+    ],
+    "questions": [
+      {
+        "q": "Why add light mode in the same chat session instead of a new one?",
+        "options": [
+          "The agent keeps context: components it touched, styling and the local-storage pattern",
+          "New chats can't use custom agents",
+          "Light mode needs high contrast to be undone first",
+          "Sessions expire after one prompt"
+        ],
+        "why": "Steering an in-flight session is faster than starting over."
+      },
+      {
+        "q": "The agent starts refactoring the toggle UI in a way you don't want. What do you do?",
+        "options": [
+          "Select Stop, then send a clarifying follow-up",
+          "Close VS Code",
+          "Delete the branch",
+          "Wait and Undo everything at the end"
+        ],
+        "why": "Stopping early saves time and keeps the useful work."
+      },
+      {
+        "q": "What does Undo on an inline diff do?",
+        "options": [
+          "Reverts that change so the agent can take another pass",
+          "Rolls back the entire branch",
+          "Deletes the chat history",
+          "Disables the custom agent"
+        ],
+        "why": "Keep and Undo act on individual edits."
+      }
+    ]
+  },
+  "vscode-6": {
+    "sourceHash": "c3a238cb98c2",
+    "summary": "Publish the accessibility branch, open the pull request, review the files changed, approve workflows, and optionally tag @copilot for a second opinion.",
+    "concepts": [
+      "AI doesn't change the fundamentals: everything goes through a real review cycle.",
+      "Check toggles, local-storage persistence, styling, ARIA attributes and keyboard navigation.",
+      "Workflows on the PR may wait for approval: select Approve and run workflows.",
+      "Tagging @copilot in a PR comment starts a new session to address it."
+    ],
+    "questions": [
+      {
+        "q": "The PR shows workflows waiting. What do you select?",
+        "options": [
+          "Approve and run workflows",
+          "Close and reopen the PR",
+          "Merge without checks",
+          "Re-run all jobs"
+        ],
+        "why": "Workflows need a human to approve them before they run."
+      },
+      {
+        "q": "What happens when you tag @copilot in a PR comment?",
+        "options": [
+          "Copilot starts a new session to address the comment",
+          "GitHub emails the Copilot team",
+          "The PR is merged automatically",
+          "Nothing; @copilot only works in issues"
+        ],
+        "why": "Ask it, for example, to review the PR for additional WCAG issues."
+      },
+      {
+        "q": "Which is most important to check in the accessibility diff?",
+        "options": [
+          "ARIA labels and keyboard navigation",
+          "Database migrations",
+          "Package lock versions",
+          "The CI runner's operating system"
+        ],
+        "why": "The accessibility patterns from the custom agent should be visible in the code."
+      }
+    ]
+  },
+  "cloud-0": {
+    "sourceHash": "8c5263d7ce63",
+    "summary": "Create your Tailspin Toys copy and start a codespace for editing instruction files and reviewing the cloud agent's work.",
+    "concepts": [
+      "The repository comes from the tailspin-toys template.",
+      "In this harness the codespace is for editing instructions and checking out Copilot's branches; cloud agent works on GitHub."
+    ],
+    "questions": [
+      {
+        "q": "What is the codespace used for in the cloud agent harness?",
+        "options": [
+          "Editing instruction files and reviewing what cloud agent produces",
+          "Running cloud agent itself",
+          "Hosting the GitHub MCP server",
+          "Nothing; it's optional decoration"
+        ],
+        "why": "Cloud agent runs in GitHub Actions, not in your codespace."
+      },
+      {
+        "q": "Where do you create your copy of the lab repository from?",
+        "options": [
+          "Use this template on github-samples/tailspin-toys",
+          "Fork github-samples/copilot-workshops",
+          "Clone and push the docs folder",
+          "Import from a ZIP file"
+        ],
+        "why": "The template gives you every file the lab needs."
+      }
+    ]
+  },
+  "cloud-1": {
+    "sourceHash": "0d9ef1c2fb02",
+    "summary": "Review the repository's instruction files and add the TSDoc standard, then merge it to main so cloud agent reads it when you assign issues.",
+    "concepts": [
+      "There's no before/after prompt here: cloud agent works asynchronously, so you see the effect later in its PRs.",
+      "Cloud agent reads instruction files from the branch the issue targets and branches from main.",
+      "Copilot also supports AGENTS.md and CLAUDE.md."
+    ],
+    "questions": [
+      {
+        "q": "Why must the instructions change land on main?",
+        "options": [
+          "Cloud agent branches from main and reads instructions from that branch",
+          "Instructions on other branches are ignored by every Copilot surface",
+          "GitHub deletes unmerged branches after a day",
+          "main is the only branch codespaces can push to"
+        ],
+        "why": "Your assigned issues start from main, so the standard has to be there."
+      },
+      {
+        "q": "Why doesn't this harness compare output before and after the instruction change?",
+        "options": [
+          "Cloud agent works asynchronously on issues, so the effect shows later in its PRs",
+          "Cloud agent ignores instruction files",
+          "Codespaces can't run Copilot Chat",
+          "The comparison needs a paid plan"
+        ],
+        "why": "You'll spot the TSDoc comments when you review the PRs."
+      },
+      {
+        "q": "True or false: Copilot also reads instruction files written to other standards, such as AGENTS.md and CLAUDE.md.",
+        "options": [
+          "True",
+          "False"
+        ],
+        "why": "Copilot supports several instruction-file conventions."
+      }
+    ]
+  },
+  "cloud-2": {
+    "sourceHash": "345fcfeeaa91",
+    "summary": "Learn how cloud agent works, review copilot-setup-steps.yml, then file two issues (documentation and related games) and assign both to Copilot.",
+    "concepts": [
+      "Assigning an issue makes Copilot open a draft [WIP] PR, set up its environment, post a to-do list and start working.",
+      "Its environment runs in GitHub Actions, customized by .github/workflows/copilot-setup-steps.yml.",
+      "That workflow has one job named copilot-setup-steps, and workflow_dispatch lets you test it from the Actions tab.",
+      "Scope issues clearly: there's no magic, and you don't get to skip the thinking.",
+      "A 👀 reaction on the issue means Copilot picked it up; View session shows its live work."
+    ],
+    "questions": [
+      {
+        "q": "Where does cloud agent's working environment run?",
+        "options": [
+          "GitHub Actions",
+          "Your codespace",
+          "Your laptop",
+          "A VS Code extension host"
+        ],
+        "why": "That's why setup is defined as a workflow."
+      },
+      {
+        "q": "Which file customizes the agent's environment?",
+        "options": [
+          ".github/workflows/copilot-setup-steps.yml",
+          ".github/copilot-instructions.md",
+          ".devcontainer/devcontainer.json",
+          ".vscode/mcp.json"
+        ],
+        "why": "It installs Node, dependencies, Playwright browsers and seeds the database."
+      },
+      {
+        "q": "Why does the setup workflow include a workflow_dispatch trigger?",
+        "options": [
+          "So you can run it by hand from the Actions tab to test it",
+          "So it runs on every push",
+          "So Copilot can skip it",
+          "So it only runs on main"
+        ],
+        "why": "You can check it works without waiting for Copilot to run it."
+      },
+      {
+        "q": "What must the setup workflow's single job be called?",
+        "options": [
+          "copilot-setup-steps",
+          "setup",
+          "build",
+          "copilot-agent"
+        ],
+        "why": "Copilot looks for that job and runs it before it starts working."
+      },
+      {
+        "type": "order",
+        "q": "Put the cloud agent assignment flow in order.",
+        "items": [
+          "Create an issue with a clear title and description",
+          "Select Assign to Copilot",
+          "Copilot opens a draft [WIP] pull request",
+          "Copilot posts its to-do list",
+          "Select View session to watch it work"
+        ],
+        "why": "Then you return to review once it's ready."
+      }
+    ]
+  },
+  "cloud-3": {
+    "sourceHash": "65199780c907",
+    "summary": "Review the accessibility custom agent, then file a high-contrast issue and assign it to Copilot with the Accessibility agent selected.",
+    "concepts": [
+      "Custom agents are Markdown files in .github/agents (or ~/.copilot/agents) with required name and description.",
+      "The Assign to Copilot dialog lets you pick a custom agent for the issue.",
+      "A custom agent is the worker; skills are its tools."
+    ],
+    "questions": [
+      {
+        "q": "How do you have a custom agent work an issue?",
+        "options": [
+          "Pick it from the custom agents list in the Assign to Copilot dialog",
+          "Mention the agent's file name in the issue title",
+          "Add a label named after the agent",
+          "Run /agent in the issue comments"
+        ],
+        "why": "Select Accessibility agent, then Assign."
+      },
+      {
+        "q": "Where can custom agents be defined globally rather than per project?",
+        "options": [
+          "~/.copilot/agents",
+          "~/.github/agents",
+          "/etc/copilot",
+          "The organization's .github repository only"
+        ],
+        "why": "Project agents live in .github/agents."
+      }
+    ]
+  },
+  "cloud-4": {
+    "sourceHash": "7764261892e1",
+    "summary": "Use the agents page as mission control to watch every task, then steer the high-contrast session so it adds light mode too.",
+    "concepts": [
+      "github.com/copilot/agents lists all agent tasks with open PRs.",
+      "Each session shows its steps: checkout, environment setup, MCP setup and the work itself, with a PR pane on the right.",
+      "Steer a running session from the Steer active session box; Copilot applies it after its current step."
+    ],
+    "questions": [
+      {
+        "q": "Where is the agents page?",
+        "options": [
+          "github.com/copilot/agents",
+          "github.com/settings/copilot",
+          "The repository's Actions tab",
+          "The repository's Insights tab"
+        ],
+        "why": "It's mission control for every cloud agent task."
+      },
+      {
+        "q": "When does Copilot act on a steering message you send mid-session?",
+        "options": [
+          "After it finishes the step it's working on",
+          "Immediately, discarding the current step",
+          "Only after the PR is merged",
+          "Never; you must assign a new issue"
+        ],
+        "why": "It folds your request into its flow at the next step."
+      },
+      {
+        "q": "What does the pane on the right of a selected session show?",
+        "options": [
+          "The pull request and its files changed",
+          "Your billing usage",
+          "The model's system prompt",
+          "The repository's README"
+        ],
+        "why": "It's there for extra monitoring while the agent works."
+      }
+    ]
+  },
+  "cloud-5": {
+    "sourceHash": "3f7a10376856",
+    "summary": "Review the three cloud agent PRs, approve workflows, request changes by tagging @copilot, and check out branches to test locally.",
+    "concepts": [
+      "Copilot has read access to the repository and write access only to its own branch.",
+      "It works in an ephemeral GitHub Actions environment, and its workflows need human approval.",
+      "External access, MCP servers included, is limited by a firewall by default; the warning in the PR is expected.",
+      "Tag @copilot in a PR or inline comment and it starts a new session to address it.",
+      "Mark the draft PR ready and merge once you're happy."
+    ],
+    "questions": [
+      {
+        "q": "What can cloud agent write to?",
+        "options": [
+          "Only the branch it uses for its work",
+          "Any branch, including main",
+          "Repository settings",
+          "Other repositories in the organization"
+        ],
+        "why": "It has read access to the repository and write access to its own branch only."
+      },
+      {
+        "q": "A PR shows a warning that Copilot was blocked by a firewall. What does it mean?",
+        "options": [
+          "It's expected: external access is limited by default and can be customized",
+          "The PR is unsafe and must be closed",
+          "Your codespace is offline",
+          "GitHub Actions is down"
+        ],
+        "why": "The firewall is a guardrail, not a failure."
+      },
+      {
+        "q": "How do you ask cloud agent to change its PR?",
+        "options": [
+          "Comment on the PR tagging @copilot",
+          "Edit the original issue title",
+          "Assign the PR to yourself",
+          "Close the PR and file a new issue"
+        ],
+        "why": "Copilot sees the comment and starts a new session, then pushes a new commit."
+      },
+      {
+        "q": "Workflows on Copilot's PR are waiting. Why?",
+        "options": [
+          "Workflows on its PRs need human approval before they run",
+          "Copilot can't trigger Actions at all",
+          "The repository has no runners",
+          "The PR is still a draft"
+        ],
+        "why": "Select Approve and run workflows after reviewing."
+      }
+    ]
+  },
+  "app-0": {
+    "sourceHash": "ce73c622588b",
+    "summary": "Install Node.js 22 or newer (or use the dev container) and create your own copy of Tailspin Toys from the template.",
+    "concepts": [
+      "Node.js is the only runtime the project needs; the LTS release is a safe choice.",
+      "With Docker you can use the dev container instead of installing Node locally.",
+      "The template seeds a backlog of issues in your new repository."
+    ],
+    "questions": [
+      {
+        "q": "Which Node.js version does the project need?",
+        "options": [
+          "22 or newer",
+          "Any version 14 or later",
+          "Exactly 18",
+          "Node isn't needed for the app harness"
+        ],
+        "why": "Agents run the test suite locally, which needs Node 22+."
+      },
+      {
+        "q": "What's the alternative to installing Node.js on your machine?",
+        "options": [
+          "The repository's dev container, if you have Docker",
+          "Running the tests on github.com",
+          "Using the Copilot app's built-in Node",
+          "There isn't one"
+        ],
+        "why": "The dev container bundles Node for you; you don't need both."
+      }
+    ]
+  },
+  "app-1": {
+    "sourceHash": "e83635d4eb2b",
+    "summary": "Install the GitHub Copilot app, sign in, add your repository, find your way around Sessions, Quick chats, My work and Automations, and ask a first quick chat.",
+    "concepts": [
+      "The app is built on Copilot CLI and integrates natively with GitHub.",
+      "It needs Copilot Student or a paid plan; Business and Enterprise admins must enable the Copilot CLI policy.",
+      "Sessions each run in an isolated git worktree, so several agents can work in parallel.",
+      "Quick chats need no branch or worktree; My work shows issues and PRs for repositories you've added."
+    ],
+    "questions": [
+      {
+        "q": "What's the difference between a quick chat and a session?",
+        "options": [
+          "Quick chats need no branch or worktree; sessions get their own isolated workspace",
+          "Quick chats can edit files; sessions can't",
+          "Sessions are read-only",
+          "There's no difference"
+        ],
+        "why": "Use quick chats for fast, throwaway questions."
+      },
+      {
+        "q": "You're on Copilot Business and the app won't work. What does your admin need to do?",
+        "options": [
+          "Enable the Copilot CLI policy",
+          "Install the GitHub Actions runner",
+          "Turn on GitHub Pages",
+          "Upgrade everyone to Enterprise"
+        ],
+        "why": "The app is built on Copilot CLI, so the CLI policy must be on."
+      },
+      {
+        "q": "What lets you run several agent sessions without their changes colliding?",
+        "options": [
+          "Each session runs in its own git worktree",
+          "Sessions take turns on one branch",
+          "Each session forks the repository",
+          "The app locks files while a session edits them"
+        ],
+        "why": "Isolated worktrees keep parallel work apart."
+      },
+      {
+        "q": "Where do your issues and pull requests appear in the app?",
+        "options": [
+          "My work",
+          "Quick chats",
+          "Automations",
+          "Settings"
+        ],
+        "why": "It's filtered to repositories you've added to the app."
+      }
+    ]
+  },
+  "app-2": {
+    "sourceHash": "5e3d92c869c5",
+    "summary": "Start your first session to show star ratings on the game cards, review the diff, run the app, then create and merge your first PR.",
+    "concepts": [
+      "A session is a conversation, the agent's tool activity, and the list of changed files with diffs.",
+      "Every session gets a dedicated worktree and branch.",
+      "Naming the file to change isn't required, but it speeds Copilot up and reduces token use.",
+      "Toggle review panel opens the diff; the panel also has a built-in terminal.",
+      "Create PR turns into Ready to merge once the workflows pass."
+    ],
+    "questions": [
+      {
+        "q": "Why did the prompt name src/components/GameCard.astro?",
+        "options": [
+          "It points Copilot to the right place, which is faster and uses fewer tokens",
+          "Copilot can't find files unless you name them",
+          "The app only edits files named in the prompt",
+          "It's needed to create the worktree"
+        ],
+        "why": "Specifying files is optional but helpful."
+      },
+      {
+        "q": "What three things do you see inside a session?",
+        "options": [
+          "The conversation, the agent's tool activity, and the changed files",
+          "The issue, the PR and the CI logs",
+          "Chat, settings and billing",
+          "Only the conversation"
+        ],
+        "why": "That's the anatomy of a session."
+      },
+      {
+        "q": "Which button label tells you the PR can be merged?",
+        "options": [
+          "Ready to merge",
+          "Create PR",
+          "Agent merge",
+          "Publish"
+        ],
+        "why": "The app watches the workflows and switches the button when they're done."
+      },
+      {
+        "q": "What should a card show when starRating is null?",
+        "options": [
+          "No rating yet",
+          "0 / 5",
+          "Nothing at all",
+          "N/A"
+        ],
+        "why": "The prompt asks for that text explicitly."
+      }
+    ]
+  },
+  "app-3": {
+    "sourceHash": "12c354622409",
+    "summary": "Start a session from the coding-standards issue, have the agent update the instruction files, preview the code it would now write, then merge.",
+    "concepts": [
+      "Most work starts from an issue: open it in My work and select New session.",
+      "Copilot reads AGENTS.md, CLAUDE.md and GEMINI.md as well as its own instruction files.",
+      "Instruction files have a big impact, so have Copilot draft them and then review the result yourself.",
+      "Once merged to the default branch, the standard applies to every new session."
+    ],
+    "questions": [
+      {
+        "q": "How do you start a session from an issue?",
+        "options": [
+          "Open the issue in My work, then select New session",
+          "Paste the issue URL into a quick chat",
+          "Create an automation for it",
+          "Assign the issue to yourself on github.com"
+        ],
+        "why": "The issue is then already in the session's context."
+      },
+      {
+        "q": "Which instruction standards does Copilot read besides its own files?",
+        "options": [
+          "AGENTS.md, CLAUDE.md and GEMINI.md",
+          "Only README.md",
+          ".editorconfig and .prettierrc",
+          "None"
+        ],
+        "why": "So Copilot gets the right context whichever convention a repo uses."
+      },
+      {
+        "q": "Why ask Copilot to show example code without making changes?",
+        "options": [
+          "To see how the new instructions will shape generated code before you merge",
+          "Because the app can't write code in this lesson",
+          "To reset the session's context",
+          "To create a PR faster"
+        ],
+        "why": "It's a quick check that the wording does what you intended."
+      },
+      {
+        "q": "Why merge the standard to the default branch?",
+        "options": [
+          "New sessions start from it, so every future session follows the standard",
+          "The app ignores unmerged branches",
+          "Merging deploys the website",
+          "It's required to close the issue"
+        ],
+        "why": "You'll see the effect in the next lesson's filtering code."
+      }
+    ]
+  },
+  "app-4": {
+    "sourceHash": "08b918b97176",
+    "summary": "From the filtering issue, plan in Plan mode, build in Autopilot, check the documentation standard was followed, and verify with /quality-checks.",
+    "concepts": [
+      "Session modes: Interactive (works with you), Plan (plan first, you approve), Autopilot (fully autonomous).",
+      "Shift+Tab cycles the mode; you can change it at any time.",
+      "AI agents don't change the development process: issue, plan, build, test, validate, PR, merge.",
+      "The quality-checks skill runs unit tests, Playwright end-to-end tests and ESLint the team's way."
+    ],
+    "questions": [
+      {
+        "q": "Which mode writes code, runs tests and iterates without waiting for you?",
+        "options": [
+          "Autopilot",
+          "Plan",
+          "Interactive",
+          "Quick chat"
+        ],
+        "why": "Save Autopilot for well-scoped, isolated tasks."
+      },
+      {
+        "q": "How do you switch the session mode from the keyboard?",
+        "options": [
+          "Shift+Tab",
+          "Ctrl+M",
+          "Alt+P",
+          "Esc twice"
+        ],
+        "why": "Press it until the mode shows Plan."
+      },
+      {
+        "q": "What does the quality-checks skill run?",
+        "options": [
+          "Unit tests, Playwright end-to-end tests and ESLint",
+          "Only the unit tests",
+          "A security scan",
+          "A production deploy"
+        ],
+        "why": "It documents which script runs which suite, in what order, and how to debug failures."
+      },
+      {
+        "type": "order",
+        "q": "Put the development flow from the lesson in order.",
+        "items": [
+          "Open the issue",
+          "Create a plan",
+          "Build and review the code",
+          "Run the tests",
+          "Manually validate the feature",
+          "Create a pull request",
+          "Merge after review and CI pass"
+        ],
+        "why": "AI-generated code goes through the same vetting as code written by hand."
+      }
+    ]
+  },
+  "app-5": {
+    "sourceHash": "4947362aff44",
+    "summary": "Add the Playwright MCP server from the app's catalog, then have the agent start the dev server and check filtering against the issue in a real browser.",
+    "concepts": [
+      "Settings (Ctrl+,) → MCP servers has a catalog of popular servers.",
+      "Tests automate validation, but driving the real UI lets the agent react to what it sees.",
+      "Treat MCP servers as dependencies: review, verify, limit access."
+    ],
+    "questions": [
+      {
+        "q": "Where do you add an MCP server in the Copilot app?",
+        "options": [
+          "Settings (Ctrl+,) → MCP servers",
+          "My work → Add server",
+          "A quick chat with /mcp add",
+          ".vscode/mcp.json"
+        ],
+        "why": "Search for Playwright and select Add server."
+      },
+      {
+        "q": "What does browser validation add beyond the automated tests?",
+        "options": [
+          "The agent uses the real UI like a user and can respond to problems it sees",
+          "It replaces the need for unit tests",
+          "It deploys the site",
+          "It makes the tests run faster"
+        ],
+        "why": "It gives more confidence the change behaves as expected."
+      },
+      {
+        "q": "How should you treat an MCP server before using it?",
+        "options": [
+          "Like any dependency: review its source and verify the publisher",
+          "As trusted, because it's in the catalog",
+          "As read-only, so it can't do harm",
+          "Ignore it; MCP servers can't access data"
+        ],
+        "why": "Be cautious about granting access to sensitive resources."
+      }
+    ]
+  },
+  "app-6": {
+    "sourceHash": "e5b046d9fbd2",
+    "summary": "Turn on Agent Merge so the app creates the PR, watches CI and reviews, fixes what blocks it, and merges once everything is green.",
+    "concepts": [
+      "Agent Merge fixes failing checks, responds to review comments, rebases when needed and merges when GitHub allows.",
+      "It runs in the background, survives app restarts and switches off once the PR is merged.",
+      "You still review and approve; the agent handles the mechanical finish line.",
+      "Enable it from the dropdown next to Create PR."
+    ],
+    "questions": [
+      {
+        "q": "With Agent Merge on, what is still your job?",
+        "options": [
+          "Reviewing and approving the work",
+          "Fixing failing CI checks",
+          "Rebasing the branch",
+          "Clicking Merge on github.com"
+        ],
+        "why": "Agent Merge handles the mechanics, not the judgment."
+      },
+      {
+        "q": "How do you turn on Agent Merge?",
+        "options": [
+          "Open the dropdown next to Create PR and select Agent merge",
+          "Settings → Experimental",
+          "Add an agent-merge label on github.com",
+          "Run /merge in the session"
+        ],
+        "why": "The button then changes to Agent merge."
+      },
+      {
+        "q": "What happens to Agent Merge once the PR is merged?",
+        "options": [
+          "It turns itself off",
+          "It moves on to the next open PR",
+          "It deletes the repository branch protection",
+          "It stays on until you restart the app"
+        ],
+        "why": "It's scoped to that one pull request."
+      }
+    ]
+  },
+  "app-7": {
+    "sourceHash": "26a5fdecf12a",
+    "summary": "Create a Kanban triage canvas, save it to the repository with Agent Merge, and start work on an issue from it in a new session.",
+    "concepts": [
+      "A canvas is a shared, interactive surface for a work artifact: a plan, board, checklist, dashboard or document.",
+      "Canvases are bidirectional: the agent updates them while you edit the same surface.",
+      "Use one when a task needs structure, iteration and verification that chat alone can't give.",
+      "Saving a canvas to the repository shares it with the team."
+    ],
+    "questions": [
+      {
+        "q": "What does \"bidirectional\" mean for a canvas?",
+        "options": [
+          "Both you and the agent can edit the same surface",
+          "It syncs to two repositories",
+          "It works in light and dark mode",
+          "It can be opened on two machines"
+        ],
+        "why": "The agent continues from your changes."
+      },
+      {
+        "q": "When should you reach for a canvas instead of chat?",
+        "options": [
+          "When the work needs structure, iteration and verification on an artifact",
+          "For every quick question",
+          "Only for code reviews",
+          "When the model is slow"
+        ],
+        "why": "Progress shows as visible changes to an artifact, not just chat replies."
+      },
+      {
+        "q": "How did you share the triage canvas with the team?",
+        "options": [
+          "Saved its definition to the repository and merged it",
+          "Exported it as a PDF",
+          "Posted it as a gist",
+          "Shared the session link"
+        ],
+        "why": "Canvases become repository assets, like instruction files and skills."
+      }
+    ]
+  },
+  "app-8": {
+    "sourceHash": "eea0b631cd2e",
+    "summary": "Create a manual, read-only automation, match mode and model to the task, and see what else the app offers.",
+    "concepts": [
+      "Automations run agent tasks manually, on a schedule, or when an issue is created.",
+      "Keep scheduled automations scoped and non-destructive until you trust their output.",
+      "Plan to think, Interactive for focused changes, Autopilot only for well-scoped isolated tasks.",
+      "Also worth exploring: rubber duck, custom agents, /chronicle, bring your own key, cloud sandboxes and deep links."
+    ],
+    "questions": [
+      {
+        "q": "Which of these is not an automation trigger in the lesson?",
+        "options": [
+          "When a pull request is merged",
+          "Manual",
+          "On a schedule",
+          "When an issue is created"
+        ],
+        "why": "The lesson lists Manual, On a schedule and When an issue is created."
+      },
+      {
+        "q": "What's the advice for new scheduled automations?",
+        "options": [
+          "Keep them scoped and non-destructive until you trust their output",
+          "Give them every tool so they never fail",
+          "Run them every minute",
+          "Always run them locally"
+        ],
+        "why": "That's why the example prompt is read-only."
+      },
+      {
+        "q": "When is Autopilot the right mode?",
+        "options": [
+          "For well-scoped, isolated tasks",
+          "For exploring an unclear idea",
+          "For every task",
+          "Only for documentation"
+        ],
+        "why": "Use Plan to think things through and Interactive to stay in the loop."
+      },
+      {
+        "q": "What does /chronicle do?",
+        "options": [
+          "Generates a narrative of what happened in a session",
+          "Shows the git log",
+          "Schedules an automation",
+          "Exports a canvas"
+        ],
+        "why": "Useful for sharing how work was done."
+      }
+    ]
+  }
+}

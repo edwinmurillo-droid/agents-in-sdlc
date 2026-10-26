@@ -1,0 +1,4 @@
+{
+  "_help": "Map a lesson id (for example cli-3) to the share link of its Bubbles walkthrough. Lessons without a link show 'Video coming soon'.",
+  "links": {}
+}

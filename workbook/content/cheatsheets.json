@@ -1,0 +1,94 @@
+[
+  {
+    "id": "where",
+    "title": "Where things live",
+    "intro": "Every customization is a file in the repository or your home folder, so it's reviewed and shared like code.",
+    "columns": ["What", "Path", "Notes"],
+    "rows": [
+      ["Repository instructions", ".github/copilot-instructions.md", "Sent with every request. Project overview, structure, global standards."],
+      ["Scoped instructions", ".github/instructions/*.instructions.md", "applyTo glob picks the files. Links resolve from the instruction file."],
+      ["Other instruction standards", "AGENTS.md, CLAUDE.md, GEMINI.md", "Also read by Copilot."],
+      ["Custom agents", ".github/agents/*.md or ~/.copilot/agents", "Frontmatter name and description are required."],
+      ["Agent skills", ".github/skills/<name>/SKILL.md or ~/.copilot/skills", "Chosen by matching the description to your request."],
+      ["MCP servers (Copilot CLI)", "~/.copilot/mcp-config.json", "Written by /mcp add."],
+      ["MCP servers (VS Code)", ".vscode/mcp.json", "Servers start on demand after you trust them."],
+      ["Cloud agent environment", ".github/workflows/copilot-setup-steps.yml", "One job named copilot-setup-steps; workflow_dispatch to test it."]
+    ]
+  },
+  {
+    "id": "cli",
+    "title": "Copilot CLI commands",
+    "intro": "Start with copilot --yolo --enable-all-github-mcp-tools inside a codespace or VM only. Add --continue to resume your last session.",
+    "columns": ["Command", "What it does"],
+    "rows": [
+      ["/help", "List every command and keyboard shortcut"],
+      ["/plan <prompt>", "Create an implementation plan before coding"],
+      ["/diff", "Review the changes made in the current directory"],
+      ["/review <prompt>", "Run the code review agent on your changes"],
+      ["/clear, /new", "Clear the conversation and start fresh"],
+      ["/compact", "Summarize history to free context space"],
+      ["/context", "Show context window usage"],
+      ["/model", "Choose the model (shows cost multiplier; persists)"],
+      ["/agent", "Pick a custom agent"],
+      ["/skills", "Manage skills"],
+      ["/mcp add, /mcp show", "Add an MCP server; list active servers"],
+      ["/share gist", "Share the session as a gist (or Markdown file)"],
+      ["/delegate", "Hand the session to cloud agent (not on Copilot Free)"],
+      ["/init", "Generate instruction files"],
+      ["/add-dir", "Add a directory to the trusted list"],
+      ["/session, /usage", "Session info; usage metrics"]
+    ]
+  },
+  {
+    "id": "surfaces",
+    "title": "Pick the right surface",
+    "intro": "The four harnesses cover the same ideas from different places. Choose by how closely you want to stay in the loop.",
+    "columns": ["Surface", "Best for", "How you work with it"],
+    "rows": [
+      ["Copilot CLI", "Terminal-first work, scripting, quick plans", "Plan mode, autopilot, slash commands, /delegate"],
+      ["VS Code agent mode", "Fast feedback while you watch", "Inline diffs with Keep/Undo, Stop, follow-up prompts"],
+      ["Cloud agent", "Backlog work you hand off and review later", "Assign issues, steer from github.com/copilot/agents, comment @copilot"],
+      ["Copilot app", "Several agents in parallel", "Worktree per session, Plan/Interactive/Autopilot, Agent Merge, canvases"]
+    ]
+  },
+  {
+    "id": "modes",
+    "title": "Copilot app session modes",
+    "intro": "Press Shift+Tab to cycle the mode. You can change it at any time.",
+    "columns": ["Mode", "What the agent does", "Use it for"],
+    "rows": [
+      ["Interactive", "Suggests changes and waits for your input", "Focused changes where you stay in the loop"],
+      ["Plan", "Writes a plan for you to approve before it acts", "Thinking through an approach"],
+      ["Autopilot", "Writes code, runs tests and iterates on its own", "Well-scoped, isolated tasks"]
+    ]
+  },
+  {
+    "id": "concepts",
+    "title": "Building blocks",
+    "intro": "How the pieces you configure fit together.",
+    "columns": ["Piece", "What it is", "Think of it as"],
+    "rows": [
+      ["Instructions", "Standards and project context added to requests", "The team handbook"],
+      ["Agent skill", "Instructions plus scripts for a repeatable task, loaded on demand", "A tool"],
+      ["Custom agent", "A specialist with its own context window that can use skills and other agents", "A worker"],
+      ["MCP server", "A bridge to external tools (actions) and resources (live data)", "A plug-in connection"],
+      ["Canvas", "A shared surface you and the agent both edit", "A whiteboard"],
+      ["Automation", "A saved agent task run manually, on a schedule or on new issues", "A recurring job"]
+    ]
+  },
+  {
+    "id": "safety",
+    "title": "Guardrails to remember",
+    "intro": "Agents speed things up; review and permissions still apply.",
+    "columns": ["Rule", "Why"],
+    "rows": [
+      ["Use --yolo only in a codespace or VM", "It allows all tools, paths and URLs"],
+      ["Review MCP servers like dependencies", "They can act on your behalf"],
+      ["Cloud agent writes only to its own branch", "Read access to the repository, write access to one branch"],
+      ["Copilot's workflows need human approval", "Select Approve and run workflows after review"],
+      ["The cloud agent firewall limits external access", "A firewall warning in a PR is expected"],
+      ["Keep scheduled automations non-destructive", "Until you trust their output"],
+      ["Review all AI-generated code before merging", "The fundamentals of DevOps don't change"]
+    ]
+  }
+]
