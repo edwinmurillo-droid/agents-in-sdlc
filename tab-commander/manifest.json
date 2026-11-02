@@ -3,12 +3,25 @@
   "name": "Tab Commander",
   "version": "1.0.0",
   "description": "Live dashboard of every open tab across all windows, with search, multi-select close, and voice commands.",
-  "permissions": ["tabs", "windows", "storage"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": [
+    "tabs",
+    "windows",
+    "storage"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Open Tab Commander"
+    "default_title": "Open Tab Commander",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }
