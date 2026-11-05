@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://edwinmurillo-droid.github.io/agents-in-sdlc/landing/sitemap.xml
