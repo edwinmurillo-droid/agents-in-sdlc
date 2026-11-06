@@ -5,7 +5,7 @@
 (function (global) {
   global.TAB_COMMANDER_CONFIG = {
     PRO_CHECKOUT_URL: "https://example.com/tab-commander-pro",
-    SITE_URL: "https://edwinmurillo-droid.github.io/agents-in-sdlc/landing/",
+    SITE_URL: "https://edwinmurillo-droid.github.io/ai-general-stuffs/hub/",
     CONTACT_EMAIL: "Edwin.Murillo@allin1sdm.com",
   };
 })(window);

@@ -39,6 +39,20 @@ Do not put payment secrets in this project. The checkout URL is a public link.
 
 Suggested Pro prices, shown on the page and not charged here: **$3 per month** or **$29 once**.
 
+## Release destination
+
+The public page is meant to replace the product hub, not a new site:
+
+`https://edwinmurillo-droid.github.io/ai-general-stuffs/hub/`
+
+`agents-in-sdlc` does not have GitHub Pages (`has_pages` is false). `https://edwinmurillo-droid.github.io/agents-in-sdlc/landing/` returns 404. Do not turn on Pages for this workshop repository, and do not change `.github/workflows/pages.yml`.
+
+The hub is published from `docs/` in `edwinmurillo-droid/ai-general-stuffs`. Today `docs/hub/index.html` is a short product index. Its footer links to `privacy.html`, which the browser resolves to `/hub/privacy.html` and that URL 404s. The policy that returns 200 is:
+
+`https://edwinmurillo-droid.github.io/ai-general-stuffs/privacy.html`
+
+This landing page links to that absolute URL. A packaged copy and a file-by-file manifest live in the release zip described in `DEPLOYMENT.md` after packaging. Preparing the package does not deploy it.
+
 ## Deploy
 
 ### Vercel
