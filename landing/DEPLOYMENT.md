@@ -1,6 +1,8 @@
 # Tab Commander hub release package
 
-This package is prepared, not deployed. Nothing in this repository publishes it.
+This package is prepared, not deployed. Nothing in this repository publishes it. Do not merge or copy it to `ai-general-stuffs` until Chief of Staff’s review of the landing page is done.
+
+The revised demo video is not in this package. It stays in `landing/video/` until that cut is accepted. The page does not embed it.
 
 ## Destination
 
@@ -43,7 +45,18 @@ Replacing `docs/hub/index.html` removes that short index from `/hub/`. The shop 
 
 Canonical, Open Graph, Twitter image, JSON-LD, and the sitemap already use `https://edwinmurillo-droid.github.io/ai-general-stuffs/hub/`.
 
-`config.js` keeps `PRO_CHECKOUT_URL` on the placeholder `https://example.com/tab-commander-pro`. The Pro button stays on the email waitlist. Do not create a checkout.
+`config.js` keeps `PRO_CHECKOUT_URL` on `https://example.com/tab-commander-pro` on purpose. That host is not a checkout. The Pro button stays on the email waitlist. The $3 and $29 figures are suggestions, not an approved paid launch. Do not create a payment account.
+
+`SITE_URL` is the hub address above, not a placeholder. Canonical and share tags already use it. They will 404 for `og.png` until this package replaces `docs/hub/`.
+
+## Chrome Web Store
+
+The live listing already points here. No extension package resubmission is required to publish the website.
+
+- Support / website: `https://edwinmurillo-droid.github.io/ai-general-stuffs/hub/`
+- Privacy policy: `https://edwinmurillo-droid.github.io/ai-general-stuffs/privacy.html`
+
+Replacing `docs/hub/` makes that existing website link show this page. Do not upload a new extension zip, and do not change the listing URLs before this page is actually at the hub. After it is there, the listing links are already correct.
 
 ## After someone deploys
 
